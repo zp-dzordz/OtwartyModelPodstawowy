@@ -1,3 +1,4 @@
+import MLXLMCommon
 import Foundation
 
 extension OMP {
@@ -13,10 +14,11 @@ extension OMP {
     }
     
     public init(
-      //      model: SystemLanguageModel = .default,
+      model: ModelContainer,
       //      tools: [any Tool] = [],
       instructions: String? = nil
     ) {
+      self.model = model
       self.instructions = instructions
     }
     
@@ -26,6 +28,7 @@ extension OMP {
     }
     
     private var instructions: String?
+    private var model: ModelContainer
   }
 }
 
