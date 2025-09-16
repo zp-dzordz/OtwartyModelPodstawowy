@@ -2,7 +2,7 @@ import MLXLMCommon
 
 extension ModelConfiguration {
   public static let llama_3_2_1b_4bit = ModelConfiguration(
-      id: "mlx-community/Llama-3.2-1B-Instruct-4bit"
+      id: "speakleash/Bielik-7B-Instruct-v0.1-MLX"
   )
 
   public static let llama_3_2_3b_4bit = ModelConfiguration(
