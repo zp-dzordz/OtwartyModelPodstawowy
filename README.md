@@ -25,7 +25,7 @@ For now, I’m testing and developing it on a MacBook Pro with M1 chip (16 GB RA
 
 ## TODO
 
-- [ ] Find a smaller model, better suited for on-device tasks (see hints in Apple’s [Foundation Models 2025 Updates](https://machinelearning.apple.com/research/apple-foundation-models-2025-updates))  
+- [ ] Find a smaller, localized model, better suited for on-device tasks (see hints in Apple’s [Foundation Models 2025 Updates](https://machinelearning.apple.com/research/apple-foundation-models-2025-updates))  
 - [ ] Tool calling — mandatory for more serious tasks  
 - [ ] Guided generation — a very interesting feature to explore  
 
