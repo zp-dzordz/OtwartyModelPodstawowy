@@ -1,5 +1,5 @@
 extension OMP {
-  @available(iOS 13.0, macOS 14.0, *)
+  @available(iOS 13.0, macOS 15.0, *)
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
   public struct GeneratedContent: Sendable, Equatable, Generable, CustomDebugStringConvertible {

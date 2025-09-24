@@ -1,16 +1,13 @@
-// swift-tools-version: 6.1
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
     name: "OtwartyModelPodstawowy",
     platforms: [
-      .iOS(.v17),
+      .iOS(.v13),
       .macOS(.v15)
     ],
     products: [
-      // Products define the executables and libraries a package produces, making them visible to other packages.
       .library(
         name: "OMP",
         targets: ["OMP"]),
@@ -19,18 +16,18 @@ let package = Package(
       .package(
         url: "https://github.com/ml-explore/mlx-swift-examples/",
         branch: "main"
-      )
+      ),
+      .package(url: "https://github.com/apple/swift-async-algorithms",
+               branch: "main")
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "OMP",
             dependencies: [
-//              .product(
-//                name: "MLX",
-//                package: "mlx-swift-examples"
-//              ),
+              .product(
+                name: "AsyncAlgorithms",
+                package: "swift-async-algorithms"
+              ),
               .product(
                 name: "MLXLMCommon",
                 package: "mlx-swift-examples"
