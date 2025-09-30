@@ -1,6 +1,16 @@
 import Testing
 @testable import OMP
 
+// TODO: Detect the locale and load appropriate model
+// TODO: Handle model availability
+// TODO: tool calling
+// TODO: @Generable macro support
+// TODO: @Guide macro support
+// TODO: Implement @PromptBuilder
+// TODO: Implement @InstructionBuilder
+// TODO: Streaming responses
+
+
 @MainActor
 @Test func testBasic() async throws {
   let instruction = "Jesteś pomocnym asystentem, ekspertem od języka polskiego i matematyki."

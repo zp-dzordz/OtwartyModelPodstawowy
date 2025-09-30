@@ -2,14 +2,14 @@
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension String : OMP.Generable {
-  public static var generationSchema: GenerationSchema {
+  public static var ompGenerationSchema: OMP.GenerationSchema {
     return .init()
   }
   
   public init(_ content: OMP.GeneratedContent) throws {
     self.init()
   }
-  public var generatedContent: OMP.GeneratedContent {
+  public var ompGeneratedContent: OMP.GeneratedContent {
     fatalError()
   }
 }

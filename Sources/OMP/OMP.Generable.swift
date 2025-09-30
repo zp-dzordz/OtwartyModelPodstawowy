@@ -10,7 +10,7 @@ extension OMP {
     associatedtype PartiallyGenerated: ConvertibleFromGeneratedContent = Self
     
     /// An instance of generation schema
-    static var generationSchema: GenerationSchema { get }
+    static var ompGenerationSchema: GenerationSchema { get }
   }
 }
 

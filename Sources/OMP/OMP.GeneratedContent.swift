@@ -3,11 +3,11 @@ extension OMP {
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
   public struct GeneratedContent: Sendable, Equatable, Generable, CustomDebugStringConvertible {
-    public static var generationSchema: GenerationSchema {
+    public static var ompGenerationSchema: GenerationSchema {
       .init()
     }
     
-    public var generatedContent: GeneratedContent {
+    public var ompGeneratedContent: GeneratedContent {
       get {
         fatalError()
       }
