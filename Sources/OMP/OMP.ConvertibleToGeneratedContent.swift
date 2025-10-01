@@ -3,6 +3,6 @@ extension OMP {
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
   public protocol ConvertibleToGeneratedContent {
-    var generatedContent: GeneratedContent { get }
+    var ompGeneratedContent: GeneratedContent { get }
   }
 }

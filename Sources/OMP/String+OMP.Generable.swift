@@ -3,7 +3,7 @@
 @available(watchOS, unavailable)
 extension String : OMP.Generable {
   public static var ompGenerationSchema: OMP.GenerationSchema {
-    return .init()
+    fatalError()
   }
   
   public init(_ content: OMP.GeneratedContent) throws {

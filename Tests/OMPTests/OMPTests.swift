@@ -25,3 +25,8 @@ import Testing
     <s>  Elokwencja literacka to umiejętność wyrażania myśli w sposób piękny, literacki i przekonujący. To zdolność do posługiwania się językiem w sposób wyrafinowany i elegancki, który zachwyca czytelnika i pozostawia na nim trwałe wrażenie. To także umiejętność tworzenia tekstów, które są pełne głębokich treści i emocji, które poruszają serca i umysły.
     """)
 }
+
+@MainActor
+@Test func testTool() async throws {
+  
+}
