@@ -2,15 +2,6 @@ import MLXLMCommon
 import Observation
 
 extension OMP {
-  
-  /// A protocol that represents a prompt.
-  @available(iOS 13.0, macOS 15.0, *)
-  @available(tvOS, unavailable)
-  @available(watchOS, unavailable)
-  public protocol PromptRepresentable { }
-}
-
-extension OMP {
   @available(iOS 13.0, macOS 15.0, *)
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
@@ -54,6 +45,16 @@ extension OMP {
     func call(arguments: Self.Arguments) async throws -> Self.Output
   }
 }
+
+@available(iOS 13.0, macOS 15.0, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
+extension OMP.Tool {
+  public var includesSchemaInInstructions: Bool {
+    return true
+  }
+}
+
 
 @available(iOS 13.0, macOS 15.0, *)
 @available(tvOS, unavailable)
@@ -126,45 +127,63 @@ extension OMP {
 }
 
 // Now let's try to map it to OMP.Tool
-//extension OMP {
-//  @Observable
-//  final class FindPointOfInterestTool: Tool {
-//    let name = "findPointsOfInterest"
-//    let description = "Finds points of interest for a landmark."
-//    
-//    let landmark: Landmark
-//    init(landmark: Landmark) {
-//      self.landmark = landmark
-//    }
-//    
-//    struct Arguments {
-//      let pointOfInterest: Category
-//      nonisolated static var ompGenerationSchema: OMP.GenerationSchema {
-//        OMP.GenerationSchema(
-//          type: Self.self,
-//          properties: [
-//            OMP.GenerationSchema.Property(
-//              name: "pointOfInterest",
-//              description: "This is the type of business to look up for.",
-//              type: Category.self
-//            )
-//          ]
-//        )
-//      }
-//      
-//      nonisolated var generatedContent: GeneratedContent {
-//        GeneratedContent(
-//          properties: [
-//            "pointOfInterest": pointOfInterest
-//          ]
-//        )
-//      }
-//    }
-//  }
-//}
-//
-//extension OMP.FindPointOfInterestTool.Arguments: nonisolated OMP.Generable {  
-//  nonisolated init(_ content: OMP.GeneratedContent) throws {
-//    self.pointOfInterest = try content.value(OMP.Category.self)
-//  }
-//}
+@available(iOS 13.0, macOS 15.0, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
+extension OMP {
+  @Observable
+  final class FindPointOfInterestTool: Tool {
+    let name = "findPointsOfInterest"
+    let description = "Finds points of interest for a landmark."
+    
+    let landmark: Landmark
+    init(landmark: Landmark) {
+      self.landmark = landmark
+    }
+    
+    struct Arguments {
+      let pointOfInterest: Category
+      nonisolated static var ompGenerationSchema: OMP.GenerationSchema {
+        OMP.GenerationSchema(
+          type: Self.self,
+          properties: [
+            OMP.GenerationSchema.Property(
+              name: "pointOfInterest",
+              description: "This is the type of business to look up for.",
+              type: Category.self
+            )
+          ]
+        )
+      }
+      
+      nonisolated var ompGeneratedContent: GeneratedContent {
+        GeneratedContent(
+          properties: [
+            "pointOfInterest": pointOfInterest
+          ]
+        )
+      }
+    }
+    
+    func call(arguments: Arguments) async throws -> String {
+      let results = await getSuggestions(category: arguments.pointOfInterest, landmark: landmark.name)
+      return """
+      There are these \(arguments.pointOfInterest) in \(landmark.name):
+      \(results.joined(separator: ", "))
+      """
+    }
+
+    func getSuggestions(category: Category, landmark: String) async -> [String] {
+      switch category {
+      case .hotel: ["Hotel 1", "Hotel 2", "Hotel 3"]
+      case .restaurant: ["Restaurant 1", "Restaurant 2", "Restaurant 3"]
+      }
+    }
+  }
+}
+
+extension OMP.FindPointOfInterestTool.Arguments: nonisolated OMP.Generable {
+  nonisolated init(_ content: OMP.GeneratedContent) throws {
+    self.pointOfInterest = try content.value(OMP.Category.self)
+  }
+}
