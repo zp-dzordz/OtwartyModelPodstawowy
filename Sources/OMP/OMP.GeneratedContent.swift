@@ -3,35 +3,57 @@ extension OMP {
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
   public struct GeneratedContent: Sendable, Equatable, Generable, CustomDebugStringConvertible {
-        
-    /// An instance of the generation schema.
+        /// An instance of the generation schema.
     public static var ompGenerationSchema: GenerationSchema {
-      fatalError()
+      GenerationSchema()
+    }
+    public var id: GenerationID?
+    
+    // Stored representation (for now just a simple enum)
+    public enum Kind: Equatable, Sendable {
+      case string(String)
+      case null
     }
     
-    /// A representation of this instance.
+    private let _kind: Kind
+    
+    public init(_ content: OMP.GeneratedContent) throws {
+      self = content
+    }
+
+    public init(_ value: some ConvertibleToGeneratedContent) {
+      self._kind = .string(String(describing: value))
+    }
+    
+    public init(_ value: some ConvertibleToGeneratedContent, id: GenerationID) {
+      self._kind = .string(String(describing: value))
+      self.id = id
+    }
+    
+    // Dummy variant for simple string literals
+    public init(_value: String) {
+      self._kind = .string(_value)
+    }
+    
+    // MARK: - ConvertibleToGeneratedContent
     public var ompGeneratedContent: GeneratedContent {
-      get {
-        fatalError()
+      self
+    }
+    
+    // MARK: - computed properties
+    public var jsonString: String {
+      switch _kind {
+      case .string(let s): return "\"\(s)\""
+      case .null: return "null"
       }
     }
     
-    /// Creates generated content representing a structure with the properties you specify.
-    ///
-    /// The order of properties is important. For ``OMP.Generable`` types, the order
-    /// must match the order properties in the types `schema`.
-    public init(properties: KeyValuePairs<String, any ConvertibleToGeneratedContent>, id: GenerationID? = nil) {
-      
-    }
-
-    public init(_ content: GeneratedContent) throws {
+    public var debugDescription: String { jsonString }
+    
+    public static func ==(lhs: GeneratedContent, rhs: GeneratedContent) -> Bool {
+      lhs.jsonString == rhs.jsonString
     }
     
-    /// Reads a top level, concrete partially generable type.
-    public func value<Value>(_ type: Value.Type = Value.self) throws -> Value where Value : ConvertibleFromGeneratedContent {
-      fatalError()
-    }
-    
-    public var debugDescription: String { "" }
+    public var isComplete: Bool { true }
   }
 }

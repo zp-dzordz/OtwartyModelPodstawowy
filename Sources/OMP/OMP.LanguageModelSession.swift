@@ -16,6 +16,28 @@ extension OMP {
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
   final public class LanguageModelSession {
+    
+  /// A Boolean value that indicates a response is being generated.
+  ///
+  /// - Important: Attempting to call any of the respond methods while
+  /// this property is `true` is a programmer error.
+    final public private(set) var isResponding: Bool = false
+    
+    /// Start a new session in blank slate state with string-based instructions.
+    ///
+    /// - Parameters
+    ///   - model: The language model to use for this session.
+    ///   - tools: Tools to make available to the model for this session.
+    ///   - instructions: Instructions that control the model's behavior.
+    public convenience init(model: SystemLanguageModel = .default, tools: [any Tool] = [], instructions: String? = nil) {
+      self.init(
+        model: model,
+        tools: tools,
+        instructions: instructions,
+        transcript: nil
+      )
+    }
+    
     @available(iOS 13.0, macOS 15.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
@@ -27,25 +49,17 @@ extension OMP {
         self.content = content
       }
     }
-    
-    public convenience init(
-      model: SystemLanguageModel = .default,
-      instructions: String? = nil
-    ) {
-      self.init(
-        model: model,
-        tools: [],
-        instructions: instructions
-      )
-    }
-    
+        
     private init(
       model: SystemLanguageModel,
       tools: [any Tool] = [],
       instructions: String? = nil,
+      transcript: String? = nil
     ) {
+      
       self.model = model
       self.instructions = instructions
+      self.tools = tools
     }
     
     final public func prewarm(promptPrefix: Prompt? = nil) {
@@ -57,7 +71,7 @@ extension OMP {
     
     @discardableResult
     nonisolated final public func respond(to prompt: String, options: GenerationOptions = GenerationOptions()) async throws -> LanguageModelSession.Response<String> {
-      
+            
       let container = try await model.loader.load()
       
       // each time you generate you will get something new.
@@ -87,10 +101,51 @@ extension OMP {
       return .init(content: output)
     }
     
+    private func generate(prompt: String, toolResult: String? = nil) async {
+      
+      self.output = ""
+      var chat: [Chat.Message] = [
+        .system("You are a helpful assistant"),
+        .user(prompt)
+      ]
+      
+      if let toolResult {
+        chat.append(.tool(toolResult))
+      }
+  
+//      let mlxTools = tools.map { ompTool in
+//        let tool = MLXLMCommon.Tool(
+//          name: ompTool.name,
+//          description: ompTool.description,
+//          parameters: ompTool.parameters,
+//          handler: <#T##(Decodable & Encodable) async throws -> Decodable & Encodable#>
+//        )
+//      }
+      
+//      let mlxTools = tools.map { ompTool in
+        //        let tool = MLXLMCommon.Tool(
+        //          name: ompTool.name,
+        //          description: ompTool.description,
+        //          parameters: [
+        //            ompTool.
+        //          ],
+        //          handler: <#T##(Decodable & Encodable) async throws -> Decodable & Encodable#>
+        //        )
+        
+//      }
+
+//      let userInput = UserInput(
+//        chat: chat,
+//        tools: <#T##[ToolSpec]?#>
+//      )
+      
+    }
+    
     private var output = ""
     private var instructions: String?
     private var model: SystemLanguageModel
     private var container: ModelContainer?
+    private let tools: [any Tool]
   }
 }
 

@@ -26,7 +26,3 @@ import Testing
     """)
 }
 
-@MainActor
-@Test func testTool() async throws {
-  
-}

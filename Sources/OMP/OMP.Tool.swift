@@ -84,13 +84,14 @@ extension OMP {
 
 extension OMP.Category:  nonisolated OMP.Generable {  
   nonisolated init(_ content: OMP.GeneratedContent) throws {
-    let rawValue = try content.value(String.self)
-    if let value = Self(rawValue: rawValue) {
-      self = value
-    } else {
-      // TODO: Turn into throw
-      fatalError("Unexpected rawValue for \(Self.self)")
-    }
+    fatalError()
+//    let rawValue = try content.value(String.self)
+//    if let value = Self(rawValue: rawValue) {
+//      self = value
+//    } else {
+//      // TODO: Turn into throw
+//      fatalError("Unexpected rawValue for \(Self.self)")
+//    }
   }
 }
 
@@ -157,11 +158,12 @@ extension OMP {
       }
       
       nonisolated var ompGeneratedContent: GeneratedContent {
-        GeneratedContent(
-          properties: [
-            "pointOfInterest": pointOfInterest
-          ]
-        )
+        fatalError()
+//        GeneratedContent(
+//          properties: [
+//            "pointOfInterest": pointOfInterest
+//          ]
+//        )
       }
     }
     
@@ -184,6 +186,7 @@ extension OMP {
 
 extension OMP.FindPointOfInterestTool.Arguments: nonisolated OMP.Generable {
   nonisolated init(_ content: OMP.GeneratedContent) throws {
-    self.pointOfInterest = try content.value(OMP.Category.self)
+    fatalError()
+//    self.pointOfInterest = try content.value(OMP.Category.self)
   }
 }

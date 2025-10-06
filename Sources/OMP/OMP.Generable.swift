@@ -7,7 +7,7 @@ extension OMP {
   public protocol Generable : ConvertibleFromGeneratedContent, ConvertibleToGeneratedContent {
    
     /// A representation of partially generated content
-    associatedtype PartiallyGenerated: ConvertibleFromGeneratedContent = Self
+//    associatedtype PartiallyGenerated: ConvertibleFromGeneratedContent = Self
     
     /// An instance of generation schema
     static var ompGenerationSchema: GenerationSchema { get }
