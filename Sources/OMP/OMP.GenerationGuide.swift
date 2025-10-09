@@ -60,3 +60,106 @@ extension GenerationGuide where Value == String {
     }
   }
 }
+
+extension GenerationGuide where Value == Int {
+    public static func minimum(_ value: Int) -> GenerationGuide<Int> {
+        GenerationGuide { candidate in candidate >= value }
+    }
+
+    public static func maximum(_ value: Int) -> GenerationGuide<Int> {
+        GenerationGuide { candidate in candidate <= value }
+    }
+
+    public static func range(_ range: ClosedRange<Int>) -> GenerationGuide<Int> {
+        GenerationGuide { candidate in range.contains(candidate) }
+    }
+}
+
+// MARK: - Float constraints
+extension GenerationGuide where Value == Float {
+    public static func minimum(_ value: Float) -> GenerationGuide<Float> {
+        GenerationGuide { candidate in candidate >= value }
+    }
+
+    public static func maximum(_ value: Float) -> GenerationGuide<Float> {
+        GenerationGuide { candidate in candidate <= value }
+    }
+
+    public static func range(_ range: ClosedRange<Float>) -> GenerationGuide<Float> {
+        GenerationGuide { candidate in range.contains(candidate) }
+    }
+}
+
+// MARK: - Decimal constraints
+extension GenerationGuide where Value == Decimal {
+    public static func minimum(_ value: Decimal) -> GenerationGuide<Decimal> {
+        GenerationGuide { candidate in candidate >= value }
+    }
+
+    public static func maximum(_ value: Decimal) -> GenerationGuide<Decimal> {
+        GenerationGuide { candidate in candidate <= value }
+    }
+
+    public static func range(_ range: ClosedRange<Decimal>) -> GenerationGuide<Decimal> {
+        GenerationGuide { candidate in range.contains(candidate) }
+    }
+}
+
+// MARK: - Double constraints
+extension GenerationGuide where Value == Double {
+    public static func minimum(_ value: Double) -> GenerationGuide<Double> {
+        GenerationGuide { candidate in candidate >= value }
+    }
+
+    public static func maximum(_ value: Double) -> GenerationGuide<Double> {
+        GenerationGuide { candidate in candidate <= value }
+    }
+
+    public static func range(_ range: ClosedRange<Double>) -> GenerationGuide<Double> {
+        GenerationGuide { candidate in range.contains(candidate) }
+    }
+}
+
+// MARK: - Array constraints
+extension GenerationGuide {
+
+    public static func minimumCount<Element>(_ count: Int) -> GenerationGuide<[Element]> where Value == [Element] {
+        GenerationGuide { candidate in candidate.count >= count }
+    }
+
+    public static func maximumCount<Element>(_ count: Int) -> GenerationGuide<[Element]> where Value == [Element] {
+        GenerationGuide { candidate in candidate.count <= count }
+    }
+
+    public static func count<Element>(_ range: ClosedRange<Int>) -> GenerationGuide<[Element]> where Value == [Element] {
+        GenerationGuide { candidate in range.contains(candidate.count) }
+    }
+
+    public static func count<Element>(_ count: Int) -> GenerationGuide<[Element]> where Value == [Element] {
+        GenerationGuide { candidate in candidate.count == count }
+    }
+
+    public static func element<Element>(_ guide: GenerationGuide<Element>) -> GenerationGuide<[Element]> where Value == [Element] {
+        GenerationGuide { candidate in candidate.allSatisfy { guide.validate($0) } }
+    }
+}
+
+// MARK: - Array<Never> constraints (macro expansion placeholders)
+extension GenerationGuide where Value == [Never] {
+
+    public static func minimumCount(_ count: Int) -> GenerationGuide<Value> {
+        GenerationGuide { _ in true }
+    }
+
+    public static func maximumCount(_ count: Int) -> GenerationGuide<Value> {
+        GenerationGuide { _ in true }
+    }
+
+    public static func count(_ range: ClosedRange<Int>) -> GenerationGuide<Value> {
+        GenerationGuide { _ in true }
+    }
+
+    public static func count(_ count: Int) -> GenerationGuide<Value> {
+        GenerationGuide { _ in true }
+    }
+}

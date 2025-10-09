@@ -1,3 +1,4 @@
+import Foundation
 import RegexBuilder
 import Testing
 @testable import OMP
@@ -23,7 +24,6 @@ struct GenerationGuideTests {
     #expect(!guide.validate("yellow"))
     #expect(!guide.validate(""))
   }
-  
   
   @Test("pattern() enforces regex matching")
   func testPatternSimple() async throws {
@@ -92,5 +92,145 @@ struct GenerationGuideTests {
     #expect(!combined.validate("apple"))   // filtered out by NOT
     #expect(!combined.validate("carrot"))
   }
+  
+  // MARK: - Int
+  @Test("Int minimum() enforces lower bound inclusive")
+  func testIntMinimum() async throws {
+      let guide = GenerationGuide<Int>.minimum(10)
+      #expect(guide.validate(10))
+      #expect(guide.validate(11))
+      #expect(!guide.validate(9))
+  }
+
+  @Test("Int maximum() enforces upper bound inclusive")
+  func testIntMaximum() async throws {
+      let guide = GenerationGuide<Int>.maximum(10)
+      #expect(guide.validate(10))
+      #expect(guide.validate(9))
+      #expect(!guide.validate(11))
+  }
+
+  @Test("Int range() enforces inclusive range")
+  func testIntRange() async throws {
+      let guide = GenerationGuide<Int>.range(5...10)
+      #expect(guide.validate(5))
+      #expect(guide.validate(8))
+      #expect(guide.validate(10))
+      #expect(!guide.validate(4))
+      #expect(!guide.validate(11))
+  }
+
+  // MARK: - Float
+  @Test("Float minimum() and maximum() are inclusive")
+  func testFloatMinMax() async throws {
+      let minGuide = GenerationGuide<Float>.minimum(1.5)
+      let maxGuide = GenerationGuide<Float>.maximum(3.5)
+      #expect(minGuide.validate(1.5))
+      #expect(minGuide.validate(2.0))
+      #expect(!minGuide.validate(1.4))
+      #expect(maxGuide.validate(3.5))
+      #expect(maxGuide.validate(2.5))
+      #expect(!maxGuide.validate(3.6))
+  }
+
+  @Test("Float range() works correctly with boundaries")
+  func testFloatRange() async throws {
+      let guide = GenerationGuide<Float>.range(0.0...1.0)
+      #expect(guide.validate(0.0))
+      #expect(guide.validate(0.5))
+      #expect(guide.validate(1.0))
+      #expect(!guide.validate(-0.1))
+      #expect(!guide.validate(1.1))
+  }
+  
+  // MARK: - Decimal
+  @Test("Decimal minimum() / maximum() / range() behave correctly")
+  func testDecimalBoundaries() async throws {
+      let minGuide = GenerationGuide<Decimal>.minimum(Decimal(2.5))
+      let maxGuide = GenerationGuide<Decimal>.maximum(Decimal(7.5))
+      let rangeGuide = GenerationGuide<Decimal>.range(Decimal(2.5)...Decimal(7.5))
+
+      #expect(minGuide.validate(Decimal(2.5)))
+      #expect(!minGuide.validate(Decimal(2.4)))
+
+      #expect(maxGuide.validate(Decimal(7.5)))
+      #expect(!maxGuide.validate(Decimal(8)))
+
+      #expect(rangeGuide.validate(Decimal(5)))
+      #expect(!rangeGuide.validate(Decimal(2)))
+      #expect(!rangeGuide.validate(Decimal(8)))
+  }
+  
+  // MARK: - Double
+  @Test("Double minimum() / maximum() / range() inclusive behavior")
+  func testDoubleBoundaries() async throws {
+      let minGuide = GenerationGuide<Double>.minimum(0.5)
+      let maxGuide = GenerationGuide<Double>.maximum(1.5)
+      let rangeGuide = GenerationGuide<Double>.range(0.5...1.5)
+
+      #expect(minGuide.validate(0.5))
+      #expect(!minGuide.validate(0.49))
+
+      #expect(maxGuide.validate(1.5))
+      #expect(!maxGuide.validate(1.51))
+
+      #expect(rangeGuide.validate(1.0))
+      #expect(!rangeGuide.validate(2.0))
+  }
+  
+  // MARK: - Array count & element validation
+  @Test("Array minimumCount() enforces inclusive lower bound")
+  func testArrayMinimumCount() async throws {
+      let guide = GenerationGuide<[Int]>.minimumCount(2)
+      #expect(guide.validate([1, 2]))
+      #expect(guide.validate([1, 2, 3]))
+      #expect(!guide.validate([1]))
+      #expect(!guide.validate([]))
+  }
+
+  @Test("Array maximumCount() enforces inclusive upper bound")
+  func testArrayMaximumCount() async throws {
+      let guide = GenerationGuide<[Int]>.maximumCount(3)
+      #expect(guide.validate([1]))
+      #expect(guide.validate([1, 2, 3]))
+      #expect(!guide.validate([1, 2, 3, 4]))
+  }
+
+  @Test("Array count(range) enforces inclusive range")
+  func testArrayCountRange() async throws {
+      let guide = GenerationGuide<[Int]>.count(2...4)
+      #expect(guide.validate([1, 2]))
+      #expect(guide.validate([1, 2, 3, 4]))
+      #expect(!guide.validate([1]))
+      #expect(!guide.validate([1, 2, 3, 4, 5]))
+  }
+
+  @Test("Array count(count) enforces exact element count")
+  func testArrayExactCount() async throws {
+      let guide = GenerationGuide<[Int]>.count(3)
+      #expect(guide.validate([1, 2, 3]))
+      #expect(!guide.validate([1, 2]))
+      #expect(!guide.validate([1, 2, 3, 4]))
+  }
+
+  @Test("Array element() enforces element-level constraints")
+  func testArrayElementGuide() async throws {
+      let numberArrayGuide = GenerationGuide<[String]>.element(
+          GenerationGuide.pattern(/^[0-9]*$/)
+      )
+      #expect(numberArrayGuide.validate(["1", "2", "999"]))
+      #expect(!numberArrayGuide.validate(["1", "A"]))
+  }
+
+  @Test("Array element() combining numeric guide")
+  func testArrayElementNumericGuide() async throws {
+      let positiveGuide = GenerationGuide<Int>.minimum(0)
+      let arrayGuide = GenerationGuide<[Int]>.element(positiveGuide)
+
+      #expect(arrayGuide.validate([0, 1, 2, 10]))
+      #expect(!arrayGuide.validate([-1, 0, 1]))
+  }
+
+
 }
 
