@@ -11,6 +11,9 @@ let package = Package(
       .library(
         name: "OMP",
         targets: ["OMP"]),
+      .library(
+        name: "Schema",
+        targets: ["Schema"])
     ],
     dependencies: [
       .package(
@@ -35,13 +38,22 @@ let package = Package(
               .product(
                 name: "MLXLLM",
                 package: "mlx-swift-examples"
-              )
+              ),
+              "Schema"
             ]
         ),
         .testTarget(
             name: "OMPTests",
             dependencies: ["OMP"]
         ),
+        .target(
+          name: "Schema",
+          dependencies: []
+        ),
+        .testTarget(
+          name: "SchemaTests",
+          dependencies: ["Schema"]
+        )
     ],
     swiftLanguageModes: [.v6]
 )

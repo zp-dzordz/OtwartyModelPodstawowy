@@ -1,5 +1,47 @@
 import Foundation
 import MLXLMCommon
+import Schema
+
+extension Bool: OMP.Generable {
+  public static var ompGenerationSchema: OMP.GenerationSchema {
+    .init(
+      type: Bool.self,
+      description: nil,
+      properties: []
+    )
+  }
+  
+  public init(_ content: OMP.GeneratedContent) throws {
+    fatalError()
+  }
+  
+  public var ompGeneratedContent: OMP.GeneratedContent {
+    fatalError()
+  }
+}
+
+//enum OMPKind: OMP.Generable {
+//  init(_ content: OMP.GeneratedContent) throws {
+//    fatalError()
+//  }
+//  
+//  var ompGeneratedContent: OMP.GeneratedContent {
+//    fatalError()
+//  }
+//  
+//  case sightseeing
+//  case foodAndDining
+//  case shopping
+//  case hotelAndLodging
+//  
+//  nonisolated static var ompGenerationSchema: OMP.GenerationSchema {
+//    OMP.GenerationSchema(type: Self.self, anyOf: ["sightseeing", "foodAndDining", "shopping", "hotelAndLodging"])
+//  }
+//}
+
+
+
+
 
 extension OMP {
   /// A type that describes the properties of an object.
@@ -7,24 +49,12 @@ extension OMP {
   /// Generation  schemas guide the output of a ``OMP.SystemLanguageModel`` to deterministically
   /// ensure the output is in the desired format.
 
-  @available(iOS 13.0, macOS 15.0, *)
-  @available(tvOS, unavailable)
-  @available(watchOS, unavailable)
-  public struct GenerationSchema : Sendable, Codable, CustomDebugStringConvertible {
-    
+  public struct GenerationSchema : Codable, CustomDebugStringConvertible {
     /// A property that belongs to a generation schema.
     ///
     /// Fields are named members of object types. Fields are strongly
     /// typed and have optional descriptions and guides.
-    @available(iOS 13.0, macOS 15.0, *)
-    @available(tvOS, unavailable)
-    @available(watchOS, unavailable)
     public struct Property : Sendable {
-      
-      public let name: String
-      public let description: String?
-      public let typeName: String
-
       /// Create a property that contains a generable type.
       ///
       /// - Parameters:
@@ -32,12 +62,19 @@ extension OMP {
       ///   - description: A natural language description of what content
       ///     should be generated for this property.
       ///   - type: The type this property represents.
-      public init<Value>(name: String, description: String? = nil, type: Value.Type) where Value : Generable {
+      public init<Value>(
+        name: String,
+        description: String? = nil,
+        type: Value.Type,
+        guides: [GenerationGuide<Value>] = []
+      ) where Value : Generable {
         self.name = name
         self.description = description
-        self.typeName = String(reflecting: type)
+        self.typeName = String(reflecting: Value.self)
+        self.guidesDescription = guides.map {
+          String(describing: $0)
+        }
       }
-      
       /// Create an optional property that contains a generable type.
       ///
       /// - Parameters:
@@ -45,30 +82,29 @@ extension OMP {
       ///   - description: A natural language description of what content
       ///     should be generated for this property.
       ///   - type: The type this property represents.
-      public init<Value>(name: String, description: String? = nil, type: Value?.Type) where Value : Generable {
+      public init<Value>(
+        name: String,
+        description: String? = nil,
+        type: Value?.Type,
+        guides: [GenerationGuide<Value>] = []
+      ) where Value : Generable {
         self.name = name
         self.description = description
-        self.typeName = String(reflecting: type)
+        self.typeName = String(reflecting: Value?.self)
+        self.guidesDescription = guides.map { String(describing: $0) }
       }
+      
+      private let name: String
+      private let description: String?
+      private let typeName: String
+      private let guidesDescription: [String]
     }
     /// A string representation of the debug description.
     ///
     /// This string is not localized and is not appropriate for display to end users.
     public var debugDescription: String {
-      var parts: [String] = []
-      parts.append("type: \(typeName)")
-      if let props = _properties { parts.append("props: [\(props.map { $0.name }.joined(separator: ", "))]") }
-      if let choices = _choices { parts.append("choices: \(choices)") }
-      if let anyOf = _anyOfTypes { parts.append("anyOf: [\(anyOf.joined(separator: ", "))]") }
-      return "<GenerationSchema \(parts.joined(separator: " | "))>"
+      fatalError()
     }
-    
-    private let typeName: String
-    private let _properties: [GenerationSchema.Property]?
-    private let _choices: [String]?
-    private let _anyOfTypes: [String]?
-    private let descriptionText: String?
-
     /// Creates a schema by providing an array of properties.
     ///
     /// - Parameters:
@@ -76,11 +112,11 @@ extension OMP {
     ///   - description: A natural language description of this schema.
     ///   - properties: An array of properties.
     public init(type: any Generable.Type, description: String? = nil, properties: [GenerationSchema.Property]) {
-      self.typeName = String(reflecting: type)
-      self.descriptionText = description
-      self._properties = properties
-      self._choices = nil
-      self._anyOfTypes = nil
+      if type == Bool.self {
+        _internalRepresentation = JSONSchema.boolean(.init(format: .unspecified, required: true))
+      } else {
+        fatalError()
+      }
     }
     
     /// Creates a schema for a string enumeration.
@@ -90,11 +126,7 @@ extension OMP {
     ///   - description: A natural language description of this schema.
     ///   - anyOf: The allowed choices.
     public init(type: any Generable.Type, description: String? = nil, anyOf choices: [String]) {
-      self.typeName = String(reflecting: type)
-      self.descriptionText = description
-      self._choices = choices
-      self._properties = nil
-      self._anyOfTypes = nil
+      fatalError()
     }
     
     /// Creates a schema as the union of several other types.
@@ -104,11 +136,7 @@ extension OMP {
     ///   - description: A natural language description of this schema.
     ///   - anyOf: The types this schema should be a union of.
     public init(type: any Generable.Type, description: String? = nil, anyOf types: [any Generable.Type]) {
-      self.typeName = String(reflecting: type)
-      self.descriptionText = description
-      self._anyOfTypes = types.map { String(reflecting: $0) }
-      self._properties = nil
-      self._choices = nil
+        fatalError()
     }
     
     /// A error that occurs when there is a problem creating a generation schema.
@@ -185,12 +213,7 @@ extension OMP {
     ///
     /// - Parameter decoder: The decoder to read data from.
     public init(from decoder: any Decoder) throws {
-      let c = try decoder.container(keyedBy: CodingKeys.self)
-      self.typeName = try c.decodeIfPresent(String.self, forKey: .typeName) ?? "<unknown>"
-      self.descriptionText = try c.decodeIfPresent(String.self, forKey: .descriptionText)
-      self._properties = try c.decodeIfPresent([GenerationSchema.Property].self, forKey: .properties)
-      self._choices = try c.decodeIfPresent([String].self, forKey: .choices)
-      self._anyOfTypes = try c.decodeIfPresent([String].self, forKey: .anyOfTypes)
+      fatalError()
     }
 
     /// Encodes this value into the given encoder.
@@ -203,18 +226,12 @@ extension OMP {
     ///
     /// - Parameter encoder: The encoder to write data to.
     public func encode(to encoder: any Encoder) throws {
-      var c = encoder.container(keyedBy: CodingKeys.self)
-      try c.encode(typeName, forKey: .typeName)
-      try c.encodeIfPresent(descriptionText, forKey: .descriptionText)
-      try c.encodeIfPresent(_properties, forKey: .properties)
-      try c.encodeIfPresent(_choices, forKey: .choices)
-      try c.encodeIfPresent(_anyOfTypes, forKey: .anyOfTypes)
+      
     }
 
-    private enum CodingKeys: String, CodingKey {
-      case typeName, descriptionText, properties, choices, anyOfTypes
-    }
+    private let _internalRepresentation: JSONSchema
   }
 }
 
-extension OMP.GenerationSchema.Property: Codable {}
+// GenerationSchema is Sendable, but unchecked due to property
+extension JSONSchema: @unchecked Sendable {}
