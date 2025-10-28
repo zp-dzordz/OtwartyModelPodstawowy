@@ -12,11 +12,11 @@ extension Bool: OMP.Generable {
   }
   
   public init(_ content: OMP.GeneratedContent) throws {
-    fatalError()
+    self = try content.value(Bool.self)
   }
   
   public var ompGeneratedContent: OMP.GeneratedContent {
-    fatalError()
+    OMP.GeneratedContent(self)
   }
 }
 

@@ -129,7 +129,11 @@ extension OMP {
     /// - Parameters:
     ///   - value: The underlying value.
     public init(_ value: some ConvertibleToGeneratedContent) {
-      self = value.ompGeneratedContent
+      if let boolValue = value as? Bool {
+        self._storage = .bool(boolValue)
+        return
+      }
+      fatalError()
     }
     
     /// Creates content that contains a single value with a custom generation ID.
@@ -142,6 +146,15 @@ extension OMP {
       tmp.id = id
       self = tmp
     }
+    
+    /// Reads a top level, concrete partially generable type.
+    public func value<Value>(_ type: Value.Type = Value.self) throws -> Value where Value: ConvertibleFromGeneratedContent {
+      if type == Bool.self, case .bool(let bool) = _storage, let toBeReturned = bool as? Value {
+        return toBeReturned
+      }
+      fatalError("Not implemented")
+    }
+    
     
     
     /// Creates equivalent content from a JSON string.

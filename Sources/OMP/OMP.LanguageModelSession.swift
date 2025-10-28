@@ -93,6 +93,28 @@ extension OMP {
       return .init(content: output)
     }
     
+    /// Produces a generable object as a response to a prompt.
+    ///
+    /// Consider using the default value of `true` for `includeSchemaInPrompt`.
+    /// The exception to the rule is when the model has knowledge about the expected response format, either
+    /// because it has been trained on it, or because it has seen exhaustive examples during this session.
+    ///
+    /// - Parameters:
+    ///   - prompt: A prompt for the model to respond to.
+    ///   - type: A type to produce as the response.
+    ///   - includeSchemaInPrompt: Inject the schema into the prompt to bias the model.
+    ///   - options: Options that control how tokens are sampled from the distribution the model produces.
+    /// - Returns: ``GeneratedContent`` containing the fields and values defined in the schema.
+    @discardableResult
+    nonisolated(nonsending) final public func respond<Content>(
+      to prompt: Prompt,
+      generating type: Content.Type = Content.self,
+      includeSchemaInPrompt: Bool = true,
+      options: GenerationOptions = GenerationOptions()
+    ) async throws -> LanguageModelSession.Response<Content> where Content: Generable  {
+      fatalError()
+    }
+
     private func generate(prompt: String, toolResult: String? = nil) async {
       
       self.output = ""
