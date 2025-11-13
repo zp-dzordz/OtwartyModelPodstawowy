@@ -15,6 +15,16 @@ Therefore, **efficiency and performance here are not expected to be comparable**
 
 ---
 
+## Thank you note
+
+I’m using parts of the source code from the following projects:
+- https://github.com/apple/swift-openapi-generator - JSON schema support
+- https://github.com/petrukha-ivan/mlx-swift-structured - constrained token generation
+
+Thanks for sharing your work!
+
+---
+
 ## Current Status
 
 The current implementation uses [`speakleash/Bielik-7B-Instruct-v0.1-MLX`](https://huggingface.co/speakleash/Bielik-7B-Instruct-v0.1-MLX),  
