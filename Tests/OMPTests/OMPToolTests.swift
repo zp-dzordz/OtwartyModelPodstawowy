@@ -1,6 +1,6 @@
 import Observation
 import Testing
-@testable import OMP
+@testable import OMPCore
 
 extension OMP {
   @Observable

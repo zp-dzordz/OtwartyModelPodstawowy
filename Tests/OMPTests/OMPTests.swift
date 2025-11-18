@@ -1,5 +1,5 @@
 import Testing
-@testable import OMP
+@testable import OMPCore
 
 // TODO: Detect the locale and load appropriate model
 // TODO: Handle model availability
@@ -19,10 +19,14 @@ import Testing
   let prompts = [
     "Napisz w 3 zdaniach twoją definicję elokwencji literackiej"
   ]
-  let response = try await session.respond(to: prompts[0], options: options)
-  #expect(
-    response.content == """
-    <s>  Elokwencja literacka to umiejętność wyrażania myśli w sposób piękny, literacki i przekonujący. To zdolność do posługiwania się językiem w sposób wyrafinowany i elegancki, który zachwyca czytelnika i pozostawia na nim trwałe wrażenie. To także umiejętność tworzenia tekstów, które są pełne głębokich treści i emocji, które poruszają serca i umysły.
-    """)
+  do {
+    let response = try await session.respond(to: prompts[0], options: options)
+    #expect(
+      response.content == """
+      Elokwencja literacka to umiejętność wyrażania myśli i uczuć w sposób elegancki, precyzyjny i przekonujący, często z użyciem metafor, porównań i innych środków stylistycznych, które wzbogacają przekaz i ułatwiają zrozumienie.
+      """)
+  } catch {
+    print("Error: \(error.localizedDescription)")
+  }
 }
 

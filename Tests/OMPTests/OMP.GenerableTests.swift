@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import OMP
+@testable import OMPCore
 
 enum Kind {
   case sightseeing

@@ -113,7 +113,7 @@ extension OMP {
     ///   - properties: An array of properties.
     public init(type: any Generable.Type, description: String? = nil, properties: [GenerationSchema.Property]) {
       if type == Bool.self {
-        _internalRepresentation = JSONSchema.boolean(.init(format: .unspecified, required: true))
+        internalRepresentation = JSONSchema.boolean(.init())
       } else {
         fatalError()
       }
@@ -229,7 +229,7 @@ extension OMP {
       
     }
 
-    private let _internalRepresentation: JSONSchema
+    let internalRepresentation: JSONSchema
   }
 }
 

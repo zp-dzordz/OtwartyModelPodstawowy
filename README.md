@@ -27,8 +27,8 @@ Thanks for sharing your work!
 
 ## Current Status
 
-The current implementation uses [`speakleash/Bielik-7B-Instruct-v0.1-MLX`](https://huggingface.co/speakleash/Bielik-7B-Instruct-v0.1-MLX),  
-which requires ~4 GB of RAM.  
+The current implementation uses [`vqstudio/Bielik-1.5B-v3.0-Instruct-MLX-4bit`](https://huggingface.co/vqstudio/Bielik-1.5B-v3.0-Instruct-MLX-4bit),  
+which requires ~1,5 GB of RAM.  
 For now, I’m testing and developing it on a MacBook Pro with M1 chip (16 GB RAM).  
 
 ---

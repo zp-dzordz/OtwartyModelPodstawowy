@@ -1,8 +1,15 @@
+import SwiftGrammar
+import Schema
 import Testing
-@testable import OMP
+@testable import OMPCore
+
 
 @Test func testBoolGeneration() async throws {
-  let instruction = "Jesteś pomocnym asystentem, ekspertem od języka polskiego?"
+  let schema = try! SwiftGrammar.schema(.boolean(.init()))
+  guard case .schema(let jsonSchema, let indent) = schema else {
+    return
+  }
+  let instruction = "Jesteś pomocnym asystentem, ekspertem od języka polskiego? Odpowiadaj używająć JSONSchema : \(jsonSchema)"
   let session = OMP.LanguageModelSession(instructions: instruction)
   let options = OMP.GenerationOptions(temperature: 0.0, maximumResponseTokens: 1024)
   let prompt = OMP.Prompt("Czy kolor biały znajduje się w godle państwa polskiego")

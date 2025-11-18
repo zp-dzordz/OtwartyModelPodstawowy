@@ -9,8 +9,8 @@ let package = Package(
   ],
   products: [
     .library(
-      name: "OMP",
-      targets: ["OMP"]),
+      name: "OMPCore",
+      targets: ["OMPCore"]),
     .library(
       name: "Schema",
       targets: ["Schema"]),
@@ -33,7 +33,7 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "OMP",
+      name: "OMPCore",
       dependencies: [
         .product(
           name: "AsyncAlgorithms",
@@ -47,12 +47,21 @@ let package = Package(
           name: "MLXLLM",
           package: "mlx-swift-examples"
         ),
-        "Schema"
+        "Schema",
+        "SwiftGrammar"
       ]
     ),
     .testTarget(
       name: "OMPTests",
-      dependencies: ["OMP"]
+      dependencies: [
+        .product(
+          name: "MLXLMCommon",
+          package: "mlx-swift-examples"
+        ),
+        "OMPCore",
+        "Schema",
+        "SwiftGrammar"
+      ]
     ),
     .target(
       name: "Schema",
@@ -66,11 +75,11 @@ let package = Package(
       name: "SwiftGrammar",
       dependencies: [
         .product(
-          name: "MLX",
-          package: "mlx-swift"
+          name: "MLXLMCommon",
+          package: "mlx-swift-examples"
         ),
+        "CXGrammarBindings",
         "Schema",
-        "CXGrammarBindings"
       ],
       swiftSettings: [
         .strictMemorySafety()

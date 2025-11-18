@@ -47,7 +47,7 @@ private extension XGrammar {
   }
 }
 
-final class XGrammar {
+public final class XGrammar {
   
   private let vocabSize: Int
   private let bufferSize: Int
@@ -55,7 +55,7 @@ final class XGrammar {
   private var bitmask: DLTensor
   private let grammarMatcher: UnsafeMutableRawPointer?
   
-  init(
+  public init(
     vocab: [String],
     vocabType: Int32 = 0,
     stopTokenIds: [Int32] = [],
@@ -134,7 +134,7 @@ final class XGrammar {
 
 extension XGrammar: GrammarMatcher {
   
-  func nextTokenMask() -> MLXArray {
+  public func nextTokenMask() -> MLXArray {
     guard withUnsafeMutablePointer(to: &bitmask, {
       grammar_matcher_fill_next_token_bitmask(grammarMatcher, $0)
     }) else {
@@ -147,7 +147,7 @@ extension XGrammar: GrammarMatcher {
     return mask
   }
   
-  func advance(token: MLXArray) {
+  public func advance(token: MLXArray) {
     let tokenID = token.item(Int32.self)
     let accepted = grammar_matcher_accept_token(grammarMatcher, tokenID)
     if !accepted {
@@ -155,7 +155,7 @@ extension XGrammar: GrammarMatcher {
     }
   }
   
-  func reset() {
+  public func reset() {
     grammar_matcher_reset(grammarMatcher)
   }
 }

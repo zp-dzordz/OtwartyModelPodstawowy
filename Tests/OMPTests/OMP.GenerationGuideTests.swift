@@ -1,7 +1,7 @@
 import Foundation
 import RegexBuilder
 import Testing
-@testable import OMP
+@testable import OMPCore
 
 struct GenerationGuideTests {
   

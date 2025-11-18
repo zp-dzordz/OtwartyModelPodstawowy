@@ -1,5 +1,5 @@
 import Testing
-@testable import OMP
+@testable import OMPCore
 
 @Test func testGenerationID() async throws {
   let a = OMP.GenerationID()

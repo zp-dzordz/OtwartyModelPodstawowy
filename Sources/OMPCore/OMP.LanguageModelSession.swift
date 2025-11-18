@@ -1,7 +1,9 @@
 import AsyncAlgorithms
 import Foundation
+import Schema
 import MLX
 import MLXLMCommon
+import SwiftGrammar
 
 extension OMP {
   @available(iOS 13.0, macOS 15.0, *)
@@ -9,10 +11,10 @@ extension OMP {
   @available(watchOS, unavailable)
   final public class LanguageModelSession {
     
-  /// A Boolean value that indicates a response is being generated.
-  ///
-  /// - Important: Attempting to call any of the respond methods while
-  /// this property is `true` is a programmer error.
+    /// A Boolean value that indicates a response is being generated.
+    ///
+    /// - Important: Attempting to call any of the respond methods while
+    /// this property is `true` is a programmer error.
     final public private(set) var isResponding: Bool = false
     
     /// Start a new session in blank slate state with string-based instructions.
@@ -36,12 +38,12 @@ extension OMP {
     public struct Response<Content> where Content: Generable {
       /// The response content
       public let content: Content
-        
+      
       public init(content: Content) {
         self.content = content
       }
     }
-        
+    
     private init(
       model: SystemLanguageModel,
       tools: [any Tool] = [],
@@ -63,13 +65,13 @@ extension OMP {
     
     @discardableResult
     nonisolated final public func respond(to prompt: String, options: GenerationOptions = GenerationOptions()) async throws -> LanguageModelSession.Response<String> {
-            
+      
       let container = try await model.loader.load()
       
       // each time you generate you will get something new.
       MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
       
-      try await container.perform { context in
+      try await container?.perform { context in
         let input = try await context.processor.prepare(input: .init(prompt: prompt))
         let stream = try MLXLMCommon.generate(
           input: input,
@@ -112,9 +114,33 @@ extension OMP {
       includeSchemaInPrompt: Bool = true,
       options: GenerationOptions = GenerationOptions()
     ) async throws -> LanguageModelSession.Response<Content> where Content: Generable  {
+      if container == nil {
+        container = try await model.loader.load()
+      }
+      // each time you generate you will get something new
+      MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
+      try await container?.perform { (context: ModelContext) -> Void in
+        let input = try await context.processor.prepare(input: .init(prompt: prompt._internal))
+//        let (result, model) = try await OMPCore.generate(
+//          input: input,
+//          context: context,
+//          schema: type.ompGenerationSchema.internalRepresentation,
+//          generating: type
+//        )
+        
+        //        let (result, model) = try await OMP.generate(
+        //          input: input,
+        //          context: context,
+        //          schema: type.ompGenerationSchema.internalRepresentation,
+        //          grammar: <#SwiftGrammar#>,
+        //          generating: type
+        //        )
+      }
+      
+      
       fatalError()
     }
-
+    
     private func generate(prompt: String, toolResult: String? = nil) async {
       
       self.output = ""
@@ -126,32 +152,32 @@ extension OMP {
       if let toolResult {
         chat.append(.tool(toolResult))
       }
-  
-//      let mlxTools = tools.map { ompTool in
-//        let tool = MLXLMCommon.Tool(
-//          name: ompTool.name,
-//          description: ompTool.description,
-//          parameters: ompTool.parameters,
-//          handler: <#T##(Decodable & Encodable) async throws -> Decodable & Encodable#>
-//        )
-//      }
       
-//      let mlxTools = tools.map { ompTool in
-        //        let tool = MLXLMCommon.Tool(
-        //          name: ompTool.name,
-        //          description: ompTool.description,
-        //          parameters: [
-        //            ompTool.
-        //          ],
-        //          handler: <#T##(Decodable & Encodable) async throws -> Decodable & Encodable#>
-        //        )
-        
-//      }
-
-//      let userInput = UserInput(
-//        chat: chat,
-//        tools: <#T##[ToolSpec]?#>
-//      )
+      //      let mlxTools = tools.map { ompTool in
+      //        let tool = MLXLMCommon.Tool(
+      //          name: ompTool.name,
+      //          description: ompTool.description,
+      //          parameters: ompTool.parameters,
+      //          handler: <#T##(Decodable & Encodable) async throws -> Decodable & Encodable#>
+      //        )
+      //      }
+      
+      //      let mlxTools = tools.map { ompTool in
+      //        let tool = MLXLMCommon.Tool(
+      //          name: ompTool.name,
+      //          description: ompTool.description,
+      //          parameters: [
+      //            ompTool.
+      //          ],
+      //          handler: <#T##(Decodable & Encodable) async throws -> Decodable & Encodable#>
+      //        )
+      
+      //      }
+      
+      //      let userInput = UserInput(
+      //        chat: chat,
+      //        tools: <#T##[ToolSpec]?#>
+      //      )
       
     }
     
@@ -167,3 +193,42 @@ extension OMP {
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension OMP.LanguageModelSession: @unchecked Sendable {}
+
+@available(iOS 13.0, macOS 15.0, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
+func generate(
+  input: LMInput,
+  parameters: GenerateParameters = GenerateParameters(),
+  context: ModelContext,
+  grammar: SwiftGrammar,
+  didGenerate: ([Int]) -> GenerateDisposition = { _ in .more }
+) async throws -> GenerateResult {
+  let sampler = parameters.sampler()
+  let processor = try await GrammarMaskedLogitProcessor.from(configuration: context.configuration, grammar: grammar)
+  let iterator = try TokenIterator(input: input, model: context.model, processor: processor, sampler: sampler)
+  let result = MLXLMCommon.generate(input: input, context: context, iterator: iterator, didGenerate: didGenerate)
+  return result
+}
+
+
+@available(iOS 13.0, macOS 15.0, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
+func generate<Content: Decodable>(
+  input: LMInput,
+  parameters: GenerateParameters = GenerateParameters(),
+  context: ModelContext,
+  schema: JSONSchema,
+  generating: Content.Type,
+  indent: Int? = nil,
+  didGenerate: ([Int]) -> GenerateDisposition = {_ in .more }
+) async throws -> (GenerateResult, Content) {
+  let grammar = try SwiftGrammar.schema(schema, indent: indent)
+  let sampler = parameters.sampler()
+  let processor = try await GrammarMaskedLogitProcessor.from(configuration: context.configuration, grammar: grammar)
+  let iterator = try TokenIterator(input: input, model: context.model, processor: processor, sampler: sampler)
+  let result = MLXLMCommon.generate(input: input, context: context, iterator: iterator, didGenerate: didGenerate)
+  let content = try JSONDecoder().decode(Content.self, from: Data(result.output.utf8))
+  return (result, content)
+}
