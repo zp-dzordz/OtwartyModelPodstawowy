@@ -120,13 +120,16 @@ extension OMP {
       // each time you generate you will get something new
       MLXRandom.seed(UInt64(Date.timeIntervalSinceReferenceDate * 1000))
       try await container?.perform { (context: ModelContext) -> Void in
-        let input = try await context.processor.prepare(input: .init(prompt: prompt._internal))
-//        let (result, model) = try await OMPCore.generate(
-//          input: input,
-//          context: context,
-//          schema: type.ompGenerationSchema.internalRepresentation,
-//          generating: type
-//        )
+        let input = try await context.processor.prepare(input: .init(chat: [
+          .system(instructions ?? ""),
+          .user(prompt._internal)
+        ]))
+        let (result, model) = try await OMPCore.generate(
+          input: input,
+          context: context,
+          schema: type.ompGenerationSchema.internalRepresentation,
+          generating: type
+        )
         
         //        let (result, model) = try await OMP.generate(
         //          input: input,
@@ -215,7 +218,7 @@ func generate(
 @available(iOS 13.0, macOS 15.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
-func generate<Content: Decodable>(
+func generate<Content: OMP.Generable>(
   input: LMInput,
   parameters: GenerateParameters = GenerateParameters(),
   context: ModelContext,
@@ -229,6 +232,9 @@ func generate<Content: Decodable>(
   let processor = try await GrammarMaskedLogitProcessor.from(configuration: context.configuration, grammar: grammar)
   let iterator = try TokenIterator(input: input, model: context.model, processor: processor, sampler: sampler)
   let result = MLXLMCommon.generate(input: input, context: context, iterator: iterator, didGenerate: didGenerate)
-  let content = try JSONDecoder().decode(Content.self, from: Data(result.output.utf8))
-  return (result, content)
+  
+  print(result.output)
+  fatalError()
+//  let content = try JSONDecoder().decode(Content.self, from: Data(result.output.utf8))
+//  return (result, content)
 }
