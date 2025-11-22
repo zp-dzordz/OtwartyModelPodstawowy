@@ -1,44 +1,45 @@
-import Foundation
-import MLX
-import MLXLLM
-import MLXLMCommon
-import Hub
-
-struct ModelInfo: Sendable {
-  var id: String
-  var revision: String
-  var extraEOSTokens: Set<String>?
-  
-  init(id: String, revision: String, extraEOSTokens: Set<String>? = nil) {
-    self.id = id
-    self.revision = revision
-    self.extraEOSTokens = extraEOSTokens
-  }
-}
-
-struct MLXLanguageModelLoader: Sendable {
-  let progress: @Sendable () -> AsyncStream<Float>
-  var load: @Sendable ()  async throws -> ModelContainer?
-}
-
-extension MLXLanguageModelLoader {
-  static func liveValue(info: ModelInfo) -> Self {
-    let (progressStream, progressContinuation) = AsyncStream<Float>.makeStream()
-    return .init(progress: {
-      progressStream
-    }, load: {
-      let hub = HubApi(useOfflineMode: false)
-      let configuration = ModelConfiguration(id: info.id, revision: info.revision, extraEOSTokens: info.extraEOSTokens ?? [])
-      let context =  try await LLMModelFactory.shared.load(
-        hub: hub,
-        configuration: configuration) { progress in
-          print(progress.fractionCompleted * 100, " %")
-          progressContinuation.yield(Float(progress.fractionCompleted) * 100)
-      }
-      return .init(context: context)
-    })
-  }
-}
+//import Foundation
+//#if MLX
+//import MLX
+//import MLXLLM
+//import MLXLMCommon
+//import Hub
+//
+//struct ModelInfo: Sendable {
+//  var id: String
+//  var revision: String
+//  var extraEOSTokens: Set<String>?
+//  
+//  init(id: String, revision: String, extraEOSTokens: Set<String>? = nil) {
+//    self.id = id
+//    self.revision = revision
+//    self.extraEOSTokens = extraEOSTokens
+//  }
+//}
+//
+//struct MLXLanguageModelLoader: Sendable {
+//  let progress: @Sendable () -> AsyncStream<Float>
+//  var load: @Sendable ()  async throws -> ModelContainer?
+//}
+//
+//extension MLXLanguageModelLoader {
+//  static func liveValue(info: ModelInfo) -> Self {
+//    let (progressStream, progressContinuation) = AsyncStream<Float>.makeStream()
+//    return .init(progress: {
+//      progressStream
+//    }, load: {
+//      let hub = HubApi(useOfflineMode: false)
+//      let configuration = ModelConfiguration(id: info.id, revision: info.revision, extraEOSTokens: info.extraEOSTokens ?? [])
+//      let context =  try await LLMModelFactory.shared.load(
+//        hub: hub,
+//        configuration: configuration) { progress in
+//          print(progress.fractionCompleted * 100, " %")
+//          progressContinuation.yield(Float(progress.fractionCompleted) * 100)
+//      }
+//      return .init(context: context)
+//    })
+//  }
+//}
 
 
 
@@ -89,24 +90,25 @@ extension MLXLanguageModelLoader {
 //  }
 //}
 
-@available(iOS 13.0, macOS 15.0, *)
-@available(tvOS, unavailable)
-@available(watchOS, unavailable)
-extension OMP {
-  public final class SystemLanguageModel: Sendable {
-    let loader: MLXLanguageModelLoader
-    
-    init(loader: MLXLanguageModelLoader) {
-      self.loader = loader
-    }
-    public static let `default`: SystemLanguageModel = .init(
-      loader: .liveValue(
-        info: .init(
-          id: "vqstudio/Bielik-1.5B-v3.0-Instruct-MLX-4bit",
-          revision: "main"
-        )
-      )
-    )
-  }
-}
+//@available(iOS 13.0, macOS 15.0, *)
+//@available(tvOS, unavailable)
+//@available(watchOS, unavailable)
+//extension OMP {
+//  public final class SystemLanguageModel: Sendable {
+//    let loader: MLXLanguageModelLoader
+//    
+//    init(loader: MLXLanguageModelLoader) {
+//      self.loader = loader
+//    }
+//    public static let `default`: SystemLanguageModel = .init(
+//      loader: .liveValue(
+//        info: .init(
+//          id: "vqstudio/Bielik-1.5B-v3.0-Instruct-MLX-4bit",
+//          revision: "main"
+//        )
+//      )
+//    )
+//  }
+//}
 
+//#endif

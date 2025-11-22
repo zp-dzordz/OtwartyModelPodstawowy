@@ -12,7 +12,7 @@ import Testing
   let instruction = "Jesteś pomocnym asystentem, ekspertem od języka polskiego. Odpowiadaj używająć JSONSchema : \(jsonSchema)"
   let session = OMP.LanguageModelSession(instructions: instruction)
   let options = OMP.GenerationOptions(temperature: 0.0, maximumResponseTokens: 1024)
-  let prompt = OMP.Prompt("Czy kolor biały znajduje się w godle państwa polskiego?")
+  let prompt = OMP.Prompt("Czy Wrocław jest stolicą Polski?")
   let response = try await session.respond(to: prompt, generating: Bool.self, options: options)
   #expect(
     response.content == true

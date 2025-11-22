@@ -9,17 +9,7 @@ extension OMP {
   @available(watchOS, unavailable)
   public struct GeneratedContent: Sendable, Equatable, Generable, CustomDebugStringConvertible {
     
-    private enum _Storage: Equatable {
-      case null
-      case bool(Bool)
-      case number(Double)
-      case string(String)
-      case array([GeneratedContent])
-      case object([String: GeneratedContent], order: [String])
-    }
-    
-    private var _storage: _Storage = .null
-    private var _isCompleteBacking: Bool = true
+    private var _kind: Kind
     
     /// An instance of the generation schema.
     public static var ompGenerationSchema: GenerationSchema {
@@ -45,25 +35,24 @@ extension OMP {
     }
     
     /// A representation of this instance.
-    public var ompGeneratedContent: GeneratedContent {
-      self
-    }
+    public var ompGeneratedContent: GeneratedContent { self }
     
     /// Creates generated content representing a structure with the properties you specify.
     ///
     /// The order of properties is important. For ``OMP.Generable`` types, the order
     /// must match the order properties in the types `schema`.
-    public init(properties: KeyValuePairs<String, any ConvertibleToGeneratedContent>, id: GenerationID? = nil) {
+    public init(
+      properties: KeyValuePairs<String, any ConvertibleToGeneratedContent>,
+      id: GenerationID? = nil
+    ) {
       var dict: [String: GeneratedContent] = [:]
-      var order: [String] = []
+      var keys: [String] = []
       for (k, v) in properties {
         let g = v.ompGeneratedContent
-        if dict[k] == nil { order.append(k) }
+        if dict[k] == nil { keys.append(k) }
         dict[k] = g
       }
-      self._storage = .object(dict, order: order)
-      self.id = id
-      self._isCompleteBacking = true
+      self.init(kind: .structure(properties: dict, orderedKeys: keys), id: id)
     }
     
     /// Creates new generated content from the key-value pairs in the given sequence,
@@ -97,31 +86,33 @@ extension OMP {
     ///   - uniquingKeysWith: A closure that is called with the values for any duplicate
     ///     keys that are encountered. The closure returns the desired value for
     ///     the final content.
-    public init<S>(properties: S, id: GenerationID? = nil, uniquingKeysWith combine: (GeneratedContent, GeneratedContent) throws -> some ConvertibleToGeneratedContent) rethrows where S : Sequence, S.Element == (String, any ConvertibleToGeneratedContent) {
+    public init<S>(
+      properties: S,
+      id: GenerationID? = nil,
+      uniquingKeysWith combine: (GeneratedContent, GeneratedContent) throws -> some ConvertibleToGeneratedContent
+    ) rethrows where S : Sequence, S.Element == (String, any ConvertibleToGeneratedContent) {
       var dict: [String: GeneratedContent] = [:]
-      var order: [String] = []
+      var keys: [String] = []
+      
       for (k, v) in properties {
-        let newC = v.ompGeneratedContent
+        let newContent = v.ompGeneratedContent
         if let existing = dict[k] {
-          let combinedOpaque = try combine(existing, newC)
-          dict[k] = combinedOpaque.ompGeneratedContent
+          dict[k] = try combine(existing, newContent).ompGeneratedContent
         } else {
-          dict[k] = newC
-          order.append(k)
+          dict[k] = newContent
+          keys.append(k)
         }
       }
-      self._storage = .object(dict, order: order)
-      self.id = id
-      self._isCompleteBacking = true
+      self.init(kind: .structure(properties: dict, orderedKeys: keys), id: id)
     }
     
     /// Creates content representing an array of elements you specify.
-    public init<S>(elements: S, id: GenerationID? = nil) where S : Sequence, S.Element == any ConvertibleToGeneratedContent {
-      var arr: [GeneratedContent] = []
-      for e in elements { arr.append(e.ompGeneratedContent) }
-      self._storage = .array(arr)
-      self.id = id
-      self._isCompleteBacking = true
+    public init<S>(
+      elements: S,
+      id: GenerationID? = nil
+    ) where S : Sequence, S.Element == any ConvertibleToGeneratedContent {
+      let contentArray = elements.map { $0.ompGeneratedContent }
+      self.init(kind: .array(contentArray), id: id)
     }
     
     /// Creates content that contains a single value.
@@ -129,150 +120,112 @@ extension OMP {
     /// - Parameters:
     ///   - value: The underlying value.
     public init(_ value: some ConvertibleToGeneratedContent) {
-      if let boolValue = value as? Bool {
-        self._storage = .bool(boolValue)
-        return
-      }
-      fatalError()
+      self = value.ompGeneratedContent
     }
-    
     /// Creates content that contains a single value with a custom generation ID.
     ///
     /// - Parameters:
     ///   - value: The underlying value.
     ///   - id: The generation ID for this content.
     public init(_ value: some ConvertibleToGeneratedContent, id: GenerationID) {
-      var tmp = value.ompGeneratedContent
-      tmp.id = id
-      self = tmp
+      self.init(kind: value.ompGeneratedContent.kind, id: id)
     }
-    
+
     /// Reads a top level, concrete partially generable type.
     public func value<Value>(_ type: Value.Type = Value.self) throws -> Value where Value: ConvertibleFromGeneratedContent {
-      if type == Bool.self, case .bool(let bool) = _storage, let toBeReturned = bool as? Value {
-        return toBeReturned
-      }
-      fatalError("Not implemented")
+      try Value(self)
     }
     
-    
-    
-    /// Creates equivalent content from a JSON string.
-    ///
-    /// The JSON string you provide may be incomplete. This is useful for correctly handling partially generated responses.
-    ///
-    /// ```swift
-    /// struct NovelIdea: Generable {
-    ///   let title: String
-    /// }
-    ///
-    /// let partial = #"{"title": "A story of"#
-    /// let content = try GeneratedContent(json: partial)
-    /// let idea = try NovelIdea(content)
-    /// print(idea.title) // A story of
-    /// ```
-    public init(json: String) throws {
-      // Try to parse as proper JSON first. If that fails, aggressively try to trim the end
-      // (handles many partially-generated cases) — mark isComplete = false when trimming needed.
-      //      func fromAny(_ any: Any) -> GeneratedContent {
-      //        switch any {
-      //        case is NSNull: return GeneratedContent(properties: [:])
-      //        case let s as String: return GeneratedContent(s)
-      //        case let b as Bool: return GeneratedContent(b)
-      //        case let n as NSNumber:
-      //          // NSNumber may represent bool or number; inspect
-      //          if CFGetTypeID(n) == CFBooleanGetTypeID() { return GeneratedContent(n.boolValue) }
-      //          return GeneratedContent(n.doubleValue)
-      //        case let arr as [Any]:
-      //          return GeneratedContent(elements: arr.map { (item: Any) -> any ConvertibleToGeneratedContent in
-      //            // wrap recursively
-      //            return fromAny(item)
-      //          })
-      //        case let dict as [String: Any]:
-      //          let kv = dict.map { ($0.key, fromAny($0.value) as any ConvertibleToGeneratedContent) }
-      //          return GeneratedContent(properties: KeyValuePairs(uniqueKeysWithValues: kv))
-      //        default:
-      //          // Fallback: string representation
-      //          return GeneratedContent(String(describing: any))
-      //        }
-      //      }
-      //
-      //      if let data = json.data(using: .utf8) {
-      //        if let parsed = try? JSONSerialization.jsonObject(with: data, options: []) {
-      //          self = fromAny(parsed)
-      //          self._isCompleteBacking = true
-      //          return
-      //        }
-      //      }
-      //
-      //      // Attempt to find a trailing boundary that yields valid JSON by trimming the end.
-      //      var trimmed = json
-      //      while !trimmed.isEmpty {
-      //        if let idx = trimmed.lastIndex(where: { $0 == "}" || $0 == "]" }) {
-      //          let candidate = String(trimmed[...idx])
-      //          if let d = candidate.data(using: .utf8), let parsed = try? JSONSerialization.jsonObject(with: d, options: []) {
-      //            self = fromAny(parsed)
-      //            self._isCompleteBacking = candidate == json
-      //            return
-      //          }
-      //        }
-      //        trimmed.removeLast()
-      //      }
-      //
-      //      // If nothing parsed, store raw string as incomplete content.
-      //      self._storage = .string(json)
-      //      self._isCompleteBacking = false
+    /// Reads a concrete `Generable` type from named property.
+    public func value<Value>(
+      _ type: Value.Type = Value.self,
+      forProperty property: String
+    ) throws -> Value where Value : ConvertibleFromGeneratedContent {
+      guard case .structure(let properties, _) = _kind,
+            let value = properties[property]
+      else {
+        throw GeneratedContentError.propertyNotFound(property)
+      }
+      return try Value(value)
     }
-    /// Returns a JSON string representation of the generated content.
-    ///
-    /// ## Examples
-    ///
-    /// ```swift
-    /// // Object with properties
-    /// let content = GeneratedContent(properties: [
-    ///     "name": "Johnny Appleseed",
-    ///     "age": 30,
-    /// ])
-    /// print(content.jsonString)
-    /// // Output: {"name": "Johnny Appleseed", "age": 30}
-    /// ```
-    public var jsonString: String {
-      func toAny(_ gc: GeneratedContent) -> Any {
-        switch gc._storage {
-        case .null: return NSNull()
-        case .bool(let b): return b
-        case .number(let d): return d
-        case .string(let s): return s
-        case .array(let arr): return arr.map { toAny($0) }
-        case .object(let dict, let order):
-          var out: [String: Any] = [:]
-          for key in order {
-            if let v = dict[key] { out[key] = toAny(v) }
-          }
-          return out
-        }
+    
+    /// Reads an optional, concrete generable type from named property.
+    public func value<Value>(
+      _ type: Value?.Type = Value?.self,
+      forProperty property: String
+    ) throws -> Value? where Value : ConvertibleFromGeneratedContent {
+      guard case .structure(let properties, _) = _kind else {
+        return nil
       }
-      let any = toAny(self)
-      if JSONSerialization.isValidJSONObject(any) {
-        if let data = try? JSONSerialization.data(withJSONObject: any, options: []) {
-          return String(data: data, encoding: .utf8) ?? "{}"
-        }
-      } else if let s = any as? String {
-        // raw string fallback
-        return "\"\(s)\""
+      guard let value = properties[property] else {
+        return nil
       }
-      return "{}"
+      return try Value(value)
     }
     
     /// A string representation for the debug description.
     public var debugDescription: String {
-      return jsonString
+      "GeneratedContent(\(kind))"
     }
     
     /// A Boolean that indicates whether the generated content is completed.
     public var isComplete: Bool {
-      return _isCompleteBacking
+      switch kind {
+      case .null, .bool, .number, .string:
+        return true
+      case .array(let elements):
+        return elements.allSatisfy { $0.isComplete }
+      case .structure(let properties, _):
+        return properties.values.allSatisfy { $0.isComplete }
+      }
     }
+
+    public static func == (a: GeneratedContent, b: GeneratedContent) -> Bool {
+      a.kind == b.kind && a.id == b.id
+    }
+  }
+}
+
+public enum GeneratedContentError: Error {
+  case propertyNotFound(String)
+  case typeMismatch
+  case neverCannotBeInstantiated
+}
+
+@available(iOS 13.0, macOS 15.0, *)
+@available(tvOS, unavailable)
+@available(watchOS, unavailable)
+extension OMP.GeneratedContent {
+  /// A representation of the different types of content that can be stored in `GeneratedContent`.
+  ///
+  /// `Kind` represents the various types of JSON-compatible data that can be held within
+  /// a ``GeneratedContent`` instance, including primitive types, arrays, and structured objects.
+  public enum Kind : Equatable, Sendable {
+    
+    /// Represents a null value.
+    case null
+    
+    /// Represents a boolean value.
+    /// - Parameter value: The boolean value.
+    case bool(Bool)
+    
+    /// Represents a numeric value.
+    /// - Parameter value: The numeric value as a Double.
+    case number(Double)
+    
+    /// Represents a string value.
+    /// - Parameter value: The string value.
+    case string(String)
+    
+    /// Represents an array of `GeneratedContent` elements.
+    /// - Parameter elements: An array of ``GeneratedContent`` instances.
+    case array([OMP.GeneratedContent])
+    
+    /// Represents a structured object with key-value pairs.
+    /// - Parameters:
+    ///   - properties: A dictionary mapping string keys to ``GeneratedContent`` values.
+    ///   - orderedKeys: An array of keys that specifies the order of properties.
+    case structure(properties: [String : OMP.GeneratedContent], orderedKeys: [String])
     
     /// Returns a Boolean value indicating whether two values are equal.
     ///
@@ -282,12 +235,44 @@ extension OMP {
     /// - Parameters:
     ///   - lhs: A value to compare.
     ///   - rhs: Another value to compare.
-    public static func == (a: GeneratedContent, b: GeneratedContent) -> Bool {
-      // If both have generation ids — use them (model-produced content should compare by id)
-      if let aid = a.id, let bid = b.id { return aid == bid }
-      // Otherwise compare structural value
-      return a._storage == b._storage
+    public static func == (a: OMP.GeneratedContent.Kind, b: OMP.GeneratedContent.Kind) -> Bool {
+      switch (a, b) {
+      case (.null, .null):
+        return true
+      case (.bool(let lhs), .bool(let rhs)):
+        return lhs == rhs
+      case (.number(let lhs), .number(let rhs)):
+        return lhs == rhs
+      case (.string(let lhs), .string(let rhs)):
+        return lhs == rhs
+      case (.array(let lhs), .array(let rhs)):
+        return lhs == rhs
+      case (.structure(let lhsProps, let lhsKeys), .structure(let rhsProps, let rhsKeys)):
+        return lhsProps == rhsProps && lhsKeys == rhsKeys
+      default:
+        return false
+      }
     }
+  }
+  
+  /// Creates a new `GeneratedContent` instance with the specified kind and `GenerationID`.
+  ///
+  /// This initializer provides a convenient way to create content from its kind representation.
+  ///
+  /// - Parameters:
+  ///   - kind: The kind of content to create.
+  ///   - id: An optional ``GenerationID`` to associate with this content.
+  public init(kind: OMP.GeneratedContent.Kind, id: OMP.GenerationID? = nil) {
+    self._kind = kind
+    self.id = id
+  }
+  
+  /// The kind representation of this generated content.
+  ///
+  /// This property provides access to the content in a strongly-typed enum representation,
+  /// preserving the hierarchical structure of the data and the  data's ``GenerationID`` ids.
+  public var kind: OMP.GeneratedContent.Kind {
+    return _kind
   }
 }
 

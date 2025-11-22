@@ -1,5 +1,4 @@
 import Foundation
-import MLXLMCommon
 import Schema
 
 extension Bool: OMP.Generable {
@@ -49,7 +48,7 @@ extension OMP {
   /// Generation  schemas guide the output of a ``OMP.SystemLanguageModel`` to deterministically
   /// ensure the output is in the desired format.
 
-  public struct GenerationSchema : Codable, CustomDebugStringConvertible {
+  public struct GenerationSchema : Sendable, Codable, CustomDebugStringConvertible {
     /// A property that belongs to a generation schema.
     ///
     /// Fields are named members of object types. Fields are strongly

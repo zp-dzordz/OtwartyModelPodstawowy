@@ -21,43 +21,43 @@ let package = Package(
       name: "CXGrammarBindings",
       targets: ["CXGrammarBindings"])
   ],
+  traits: [
+    .trait(name: "MLX"),
+    .default(enabledTraits: [])
+  ],
   dependencies: [
-    .package(url: "https://github.com/ml-explore/mlx-swift", from: "0.25.6"),
-    .package(
-      url: "https://github.com/ml-explore/mlx-swift-examples/",
-      branch: "main"
-    ),
-    .package(url: "https://github.com/apple/swift-async-algorithms",
-             branch: "main"),
-    
+    .package(url: "https://github.com/ml-explore/mlx-swift-lm", branch: "main")
   ],
   targets: [
     .target(
       name: "OMPCore",
       dependencies: [
-        .product(
-          name: "AsyncAlgorithms",
-          package: "swift-async-algorithms"
-        ),
-        .product(
-          name: "MLXLMCommon",
-          package: "mlx-swift-examples"
-        ),
-        .product(
-          name: "MLXLLM",
-          package: "mlx-swift-examples"
-        ),
         "Schema",
-        "SwiftGrammar"
+        "SwiftGrammar",
+        .product(
+            name: "MLXLLM",
+            package: "mlx-swift-lm",
+            condition: .when(traits: ["MLX"])
+        ),
+        .product(
+            name: "MLXVLM",
+            package: "mlx-swift-lm",
+            condition: .when(traits: ["MLX"])
+        ),
+        .product(
+            name: "MLXLMCommon",
+            package: "mlx-swift-lm",
+            condition: .when(traits: ["MLX"])
+        )
       ]
     ),
     .testTarget(
       name: "OMPTests",
       dependencies: [
-        .product(
-          name: "MLXLMCommon",
-          package: "mlx-swift-examples"
-        ),
+//        .product(
+//          name: "MLXLMCommon",
+//          package: "mlx-swift-examples"
+//        ),
         "OMPCore",
         "Schema",
         "SwiftGrammar"
@@ -74,12 +74,17 @@ let package = Package(
     .target(
       name: "SwiftGrammar",
       dependencies: [
-        .product(
-          name: "MLXLMCommon",
-          package: "mlx-swift-examples"
-        ),
+//        .product(
+//          name: "MLXLMCommon",
+//          package: "mlx-swift-examples"
+//        ),
         "CXGrammarBindings",
         "Schema",
+        .product(
+            name: "MLXLMCommon",
+            package: "mlx-swift-lm",
+            condition: .when(traits: ["MLX"])
+        )
       ],
       swiftSettings: [
         .strictMemorySafety()
@@ -88,10 +93,10 @@ let package = Package(
     .testTarget(
       name: "SwiftGrammarTests",
       dependencies: [
-        .product(
-          name: "MLX",
-          package: "mlx-swift"
-        ),
+//        .product(
+//          name: "MLX",
+//          package: "mlx-swift"
+//        ),
         "Schema",
         "SwiftGrammar"
       ]

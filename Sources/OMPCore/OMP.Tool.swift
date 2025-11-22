@@ -1,4 +1,3 @@
-import MLXLMCommon
 import Observation
 
 extension OMP {
@@ -95,6 +94,7 @@ extension OMP.Category:  nonisolated OMP.Generable {
   }
 }
 
+#if MLX
 // Let's start with trying to prototype with MLX first
 extension OMP {
   final class FindPointsOfInterestMLXTool {
@@ -126,6 +126,7 @@ extension OMP {
     }
   }
 }
+#endif
 
 // Now let's try to map it to OMP.Tool
 @available(iOS 13.0, macOS 15.0, *)

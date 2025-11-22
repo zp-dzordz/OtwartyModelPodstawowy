@@ -1,3 +1,4 @@
+#if MLX
 import Hub
 import MLXLMCommon
 
@@ -66,3 +67,4 @@ public extension GrammarMaskedLogitProcessor {
     return processor
   }
 }
+#endif

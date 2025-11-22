@@ -19,7 +19,9 @@ Therefore, **efficiency and performance here are not expected to be comparable**
 
 I’m using parts of the source code from the following projects:
 - https://github.com/apple/swift-openapi-generator - JSON schema support
+- https://github.com/mlc-ai/xgrammar - low-level grammar parsing
 - https://github.com/petrukha-ivan/mlx-swift-structured - constrained token generation
+- https://github.com/mattt/AnyLanguageModel - makes my Apple API implementation guessing game less bumpy
 
 Thanks for sharing your work!
 
