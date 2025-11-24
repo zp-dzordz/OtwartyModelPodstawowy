@@ -1,4 +1,3 @@
-#if MLX
 import Hub
 import MLXLMCommon
 
@@ -21,7 +20,11 @@ public extension GrammarMaskedLogitProcessor {
       configurations.tokenizerData
     )
     
-    let vocabSize = modelConfig.vocabSize.integer(or: .zero)
+    guard let vocabSize = modelConfig?.vocabSize.integer(or: .zero) else {
+      #warning("Add proper throw")
+      fatalError("modelConfig cannot be nil")
+    }
+            
     var vocab = Array(repeating: "", count: vocabSize)
     
     for (key, value) in tokenizerData.model.vocab.dictionary(or: [:]) {
@@ -67,4 +70,3 @@ public extension GrammarMaskedLogitProcessor {
     return processor
   }
 }
-#endif

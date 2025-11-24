@@ -36,6 +36,10 @@ extension OMP {
         self = content.ompPromptRepresentation
       }
     }
+    public var description: String {
+      return _internal
+    }
+    
     var _internal: String = ""
   }
 }

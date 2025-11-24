@@ -12,11 +12,14 @@ let package = Package(
       name: "OMPCore",
       targets: ["OMPCore"]),
     .library(
+      name: "OMPMLX",
+      targets: ["OMPMLX"]),
+    .library(
       name: "Schema",
       targets: ["Schema"]),
     .library(
-      name: "SwiftGrammar",
-      targets: ["SwiftGrammar"]),
+      name: "SwiftGrammarMLX",
+      targets: ["SwiftGrammarMLX"]),
     .library(
       name: "CXGrammarBindings",
       targets: ["CXGrammarBindings"])
@@ -32,23 +35,23 @@ let package = Package(
     .target(
       name: "OMPCore",
       dependencies: [
-        "Schema",
-        "SwiftGrammar",
-        .product(
-            name: "MLXLLM",
-            package: "mlx-swift-lm",
-            condition: .when(traits: ["MLX"])
-        ),
-        .product(
-            name: "MLXVLM",
-            package: "mlx-swift-lm",
-            condition: .when(traits: ["MLX"])
-        ),
-        .product(
-            name: "MLXLMCommon",
-            package: "mlx-swift-lm",
-            condition: .when(traits: ["MLX"])
-        )
+        "Schema"
+//        "SwiftGrammarMLX",
+//        .product(
+//            name: "MLXLLM",
+//            package: "mlx-swift-lm",
+//            condition: .when(traits: ["MLX"])
+//        ),
+//        .product(
+//            name: "MLXVLM",
+//            package: "mlx-swift-lm",
+//            condition: .when(traits: ["MLX"])
+//        ),
+//        .product(
+//            name: "MLXLMCommon",
+//            package: "mlx-swift-lm",
+//            condition: .when(traits: ["MLX"])
+//        )
       ]
     ),
     .testTarget(
@@ -60,7 +63,36 @@ let package = Package(
 //        ),
         "OMPCore",
         "Schema",
-        "SwiftGrammar"
+//        "SwiftGrammarMLX"
+      ]
+    ),
+    .target(
+      name: "OMPMLX",
+      dependencies: [
+        "OMPCore",
+        "SwiftGrammarMLX",
+        .product(
+            name: "MLXLLM",
+            package: "mlx-swift-lm"/*,
+            condition: .when(traits: ["MLX"])*/
+        ),
+        .product(
+            name: "MLXVLM",
+            package: "mlx-swift-lm"/*,
+            condition: .when(traits: ["MLX"])*/
+        ),
+        .product(
+            name: "MLXLMCommon",
+            package: "mlx-swift-lm"/*,
+            condition: .when(traits: ["MLX"])*/
+        )
+      ]
+    ),
+    .testTarget(
+      name: "OMPMLXTests",
+      dependencies: [
+        "OMPCore",
+        "OMPMLX"
       ]
     ),
     .target(
@@ -72,7 +104,7 @@ let package = Package(
       dependencies: ["Schema"]
     ),
     .target(
-      name: "SwiftGrammar",
+      name: "SwiftGrammarMLX",
       dependencies: [
 //        .product(
 //          name: "MLXLMCommon",
@@ -83,7 +115,7 @@ let package = Package(
         .product(
             name: "MLXLMCommon",
             package: "mlx-swift-lm",
-            condition: .when(traits: ["MLX"])
+//            condition: .when(traits: ["MLX"])
         )
       ],
       swiftSettings: [
@@ -91,14 +123,14 @@ let package = Package(
       ]
     ),
     .testTarget(
-      name: "SwiftGrammarTests",
+      name: "SwiftGrammarMLXTests",
       dependencies: [
 //        .product(
 //          name: "MLX",
 //          package: "mlx-swift"
 //        ),
         "Schema",
-        "SwiftGrammar"
+        "SwiftGrammarMLX"
       ]
     ),
     .target(

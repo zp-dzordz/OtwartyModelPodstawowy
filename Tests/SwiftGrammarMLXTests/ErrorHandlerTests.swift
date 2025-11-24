@@ -1,5 +1,5 @@
 import Testing
-@testable import SwiftGrammar
+@testable import SwiftGrammarMLX
 
 @Test
 func testEmptyJSONSchemaGrammar() async throws {

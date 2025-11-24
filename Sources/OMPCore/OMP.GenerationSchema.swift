@@ -135,7 +135,7 @@ extension OMP {
     ///   - description: A natural language description of this schema.
     ///   - anyOf: The types this schema should be a union of.
     public init(type: any Generable.Type, description: String? = nil, anyOf types: [any Generable.Type]) {
-        fatalError()
+      fatalError()
     }
     
     /// A error that occurs when there is a problem creating a generation schema.
@@ -214,7 +214,7 @@ extension OMP {
     public init(from decoder: any Decoder) throws {
       fatalError()
     }
-
+    
     /// Encodes this value into the given encoder.
     ///
     /// If the value fails to encode anything, `encoder` will encode an empty
@@ -225,10 +225,12 @@ extension OMP {
     ///
     /// - Parameter encoder: The encoder to write data to.
     public func encode(to encoder: any Encoder) throws {
-      
     }
-
+    
     let internalRepresentation: JSONSchema
+    public var jsonSchema: JSONSchema {
+      return internalRepresentation
+    }
   }
 }
 

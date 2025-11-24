@@ -8,9 +8,7 @@
 import Foundation
 import CXGrammarBindings
 
-#if MLX
 import MLX
-#endif
 
 enum XCGrammarError: Error {
   case emptyGrammar
@@ -54,9 +52,7 @@ public final class XGrammar {
   
   private let vocabSize: Int
   private let bufferSize: Int
-  #if MLX
   private let bitmap: MLXArray
-  #endif
   private var bitmask: DLTensor
   private let grammarMatcher: UnsafeMutableRawPointer?
   
@@ -124,9 +120,7 @@ public final class XGrammar {
 
     self.vocabSize = vocab.count
     self.bufferSize = (vocab.count + 31) / 32
-    #if MLX
     self.bitmap = MLXArray(bitmap).reshaped([256, 8])
-    #endif
     self.bitmask = DLTensor.nextTokenBitmask(bufferSize: bufferSize)
     self.grammarMatcher = grammarMatcher
   }
@@ -141,7 +135,6 @@ public final class XGrammar {
 
 
 extension XGrammar: GrammarMatcher {
-  #if MLX
   public func nextTokenMask() -> MLXArray {
     guard withUnsafeMutablePointer(to: &bitmask, {
       grammar_matcher_fill_next_token_bitmask(grammarMatcher, $0)
@@ -166,7 +159,6 @@ extension XGrammar: GrammarMatcher {
   public func reset() {
     grammar_matcher_reset(grammarMatcher)
   }
-  #endif
 }
 
 private extension DLTensor {

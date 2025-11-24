@@ -1,6 +1,8 @@
+#if MLX
 import MLX
+#endif
 import Schema
-@testable import SwiftGrammar
+@testable import SwiftGrammarMLX
 import Testing
 
 @Test func testBooleanJSONSchemaGrammarMatcher() async throws {
@@ -17,11 +19,13 @@ import Testing
     [1, 0, 0, 0, 0, 0, 0, 0] // "<eos>"
   ]
   
+  #if MLX
   for (expectation, advance) in zip(expectations, advances) {
     let mask = grammarMatcher.nextTokenMask()
     let allowed = mask.exp().asArray(Int.self)
     #expect(allowed == expectation)
     grammarMatcher.advance(token: MLXArray(advance))
   }
+  #endif
 }
 

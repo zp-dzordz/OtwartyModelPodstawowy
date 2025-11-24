@@ -1,6 +1,5 @@
 import Foundation
 import Schema
-import SwiftGrammar
 
 extension OMP {
   @available(iOS 13.0, macOS 15.0, *)
@@ -52,7 +51,8 @@ extension OMP {
       self.init(
         model: model,
         tools: tools,
-        instructions: instructions
+        instructions: instructions,
+        transcript: Transcript()
       )
     }
     
@@ -210,9 +210,9 @@ extension OMP {
       }
     }
     
-    private var instructions: Instructions?
+    var instructions: Instructions?
     private let model: any LanguageModel
-    private let tools: [any Tool]
+    public  let tools: [any Tool]
     private let respondingState = RespondingState()
   }
 }
@@ -226,10 +226,7 @@ extension OMP.LanguageModelSession {
   ///   - options: GenerationOptions that control how tokens are sampled from the distribution the model produces.
   /// - Returns: A string composed of the tokens produced by sampling model output.
   @discardableResult
-  nonisolated(nonsending) final public func respond(
-    to prompt: OMP.Prompt,
-    options: OMP.GenerationOptions = OMP.GenerationOptions()
-  ) async throws -> OMP.LanguageModelSession.Response<String> {
+  nonisolated(nonsending) final public func respond(to prompt: OMP.Prompt, options: OMP.GenerationOptions = OMP.GenerationOptions()) async throws -> OMP.LanguageModelSession.Response<String> {
     try await respond(
       to: prompt,
       generating: String.self,
@@ -264,47 +261,3 @@ extension OMP {
     }
   }
 }
-
-//@available(iOS 13.0, macOS 15.0, *)
-//@available(tvOS, unavailable)
-//@available(watchOS, unavailable)
-//func generate(
-//  input: LMInput,
-//  parameters: GenerateParameters = GenerateParameters(),
-//  context: ModelContext,
-//  grammar: SwiftGrammar,
-//  didGenerate: ([Int]) -> GenerateDisposition = { _ in .more }
-//) async throws -> GenerateResult {
-//  let sampler = parameters.sampler()
-//  let processor = try await GrammarMaskedLogitProcessor.from(configuration: context.configuration, grammar: grammar)
-//  let iterator = try TokenIterator(input: input, model: context.model, processor: processor, sampler: sampler)
-//  let result = MLXLMCommon.generate(input: input, context: context, iterator: iterator, didGenerate: didGenerate)
-//  return result
-//}
-//
-//
-//@available(iOS 13.0, macOS 15.0, *)
-//@available(tvOS, unavailable)
-//@available(watchOS, unavailable)
-//func generate<Content: OMP.Generable>(
-//  input: LMInput,
-//  parameters: GenerateParameters = GenerateParameters(),
-//  context: ModelContext,
-//  schema: JSONSchema,
-//  generating: Content.Type,
-//  indent: Int? = nil,
-//  didGenerate: ([Int]) -> GenerateDisposition = {_ in .more }
-//) async throws -> (GenerateResult, Content) {
-//  let grammar = try SwiftGrammar.schema(schema, indent: indent)
-//  let sampler = parameters.sampler()
-//  let processor = try await GrammarMaskedLogitProcessor.from(configuration: context.configuration, grammar: grammar)
-//  let iterator = try TokenIterator(input: input, model: context.model, processor: processor, sampler: sampler)
-//  let result = MLXLMCommon.generate(input: input, context: context, iterator: iterator, didGenerate: didGenerate)
-//
-//
-//
-//  print(result.output)
-//  fatalError()
-////  let content = try JSONDecoder().decode(Content.self, from: Data(result.output.utf8))
-////  return (result, content)
-//}

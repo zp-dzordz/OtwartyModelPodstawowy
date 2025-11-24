@@ -131,6 +131,52 @@ extension OMP {
       self.init(kind: value.ompGeneratedContent.kind, id: id)
     }
 
+    /// Returns a JSON string representation of the generated content.
+    ///
+    /// ## Examples
+    ///
+    /// ```swift
+    /// // Object with properties
+    /// let content = GeneratedContent(properties: [
+    ///     "name": "Johnny Appleseed",
+    ///     "age": 30,
+    /// ])
+    /// print(content.jsonString)
+    /// // Output: {"name": "Johnny Appleseed", "age": 30}
+    /// ```
+    public var jsonString: String {
+      do {
+        let jsonValue = try toJSONValue()
+        let data = try JSONSerialization.data(withJSONObject: jsonValue, options: [.fragmentsAllowed])
+        return String(data: data, encoding: .utf8) ?? "{}"
+      } catch {
+        return "{}"
+      }
+    }
+    
+    private func toJSONValue() throws -> Any {
+      switch kind {
+      case .null:
+        return NSNull()
+      case .bool(let value):
+        return value
+      case .number(let value):
+        return value
+      case .string(let value):
+        return value
+      case .array(let elements):
+        return try elements.map { try $0.toJSONValue() }
+      case .structure(let properties, let orderedKeys):
+        var dict: [String: Any] = [:]
+        for key in orderedKeys {
+          if let value = properties[key] {
+            dict[key] = try value.toJSONValue()
+          }
+        }
+        return dict
+      }
+    }
+    
     /// Reads a top level, concrete partially generable type.
     public func value<Value>(_ type: Value.Type = Value.self) throws -> Value where Value: ConvertibleFromGeneratedContent {
       try Value(self)

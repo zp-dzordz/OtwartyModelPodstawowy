@@ -38,7 +38,8 @@ extension OMP.LanguageModel {
 }
 
 extension OMP.LanguageModel where UnavailableReason == Never {
-  var availability: OMP.Availability<UnavailableReason> {
+  public var availability: OMP.Availability<UnavailableReason> {
     return .available
   }
 }
+

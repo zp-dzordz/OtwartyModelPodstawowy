@@ -1,4 +1,5 @@
-#if MLX
+
+import MLX
 import MLXLMCommon
 
 public final class GrammarMaskedLogitProcessor: LogitProcessor, @unchecked Sendable {
@@ -20,6 +21,5 @@ public final class GrammarMaskedLogitProcessor: LogitProcessor, @unchecked Senda
     grammarMatcher.advance(token: token)
   }
 }
-#endif
 
 

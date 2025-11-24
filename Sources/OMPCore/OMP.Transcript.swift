@@ -91,6 +91,13 @@ extension OMP {
       entries.endIndex
     }
     
+    /// Creates a transcript.
+    ///
+    /// - Parameters:
+    ///   - entries: An array of entries to seed the transcript.
+    public init(entries: some Sequence<Entry> = []) {
+        self.entries = Array(entries)
+    }
     
     /// An entry in a transcript.
     ///
@@ -106,7 +113,10 @@ extension OMP {
       
       /// A prompt, typically sourced from an end user.
       case prompt(Prompt)
-      
+
+      /// A response from the model.
+      case response(Response)
+
       /// The stable identity of the entity associated with this instance.
       public var id: String {
         switch self {
@@ -114,6 +124,8 @@ extension OMP {
           return instructions.id
         case .prompt(let prompt):
           return prompt.id
+        case .response(let response):
+          return response.id
         }
       }
     }
@@ -371,6 +383,30 @@ extension OMP {
       }
     }
     
+    @available(iOS 13.0, macOS 15.0, *)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    public struct Response : Sendable, Identifiable, Equatable {
+      /// The stable identity of the entity associated with this instance.
+      public var id: String
+      
+      /// Version aware identifiers for all assets used to generate this response.
+      public var assetIDs: [String]
+      
+      /// Ordered prompt segments.
+      public var segments: [Segment]
+      
+      public init(
+        id: String = UUID().uuidString,
+        assetIDs: [String],
+        segments: [Transcript.Segment]
+      ) {
+        self.id = id
+        self.assetIDs = assetIDs
+        self.segments = segments
+      }
+    }
+
     /// Appends a single entry to the transcript.
     mutating func append(_ entry: Entry) {
       entries.append(entry)
