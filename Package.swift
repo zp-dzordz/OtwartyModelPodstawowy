@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
   name: "OtwartyModelPodstawowy",
   platforms: [
-    .iOS(.v13),
+    .iOS(.v16),
     .macOS(.v14)
   ],
   products: [
