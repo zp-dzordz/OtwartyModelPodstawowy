@@ -30,7 +30,7 @@ import Foundation
 /// }
 /// ```
 extension OMP {
-  @available(iOS 13.0, macOS 15.0, *)
+  @available(iOS 13.0, macOS 14.0, *)
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
   public struct Transcript: Sendable, Equatable, RandomAccessCollection {
@@ -104,7 +104,7 @@ extension OMP {
     /// An individual entry in a transcript may represent instructions from you
     /// to the model, a prompt from a user, tool calls, or a response generated
     /// by the model.
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public enum Entry: Sendable, Identifiable, Equatable {
@@ -134,7 +134,7 @@ extension OMP {
     /// Instructions are typically provided to define the role and behavior of the model. Apple trains the model
     /// to obey instructions over any commands it receives in prompts. This is a security mechanism to help
     /// mitigate prompt injection attacks.
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public struct Instructions : Sendable, Identifiable, Equatable {
@@ -173,7 +173,7 @@ extension OMP {
     /// Prompts typically contain content sourced directly from the user,
     /// though you may choose to augment prompts by interpolating content from
     /// end users into a template that you control.
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public struct Prompt : Sendable, Identifiable, Equatable {
@@ -210,7 +210,7 @@ extension OMP {
     }
     
     /// Specifies a response format that the model must conform its output to.
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public struct ResponseFormat : Sendable, Equatable {
@@ -259,7 +259,7 @@ extension OMP {
     }
     
     /// The types of segments that may be included in a transcript entry.
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public enum Segment : Sendable, Identifiable, Equatable {
@@ -286,7 +286,7 @@ extension OMP {
     }
     
     /// A segment containing text.
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public struct TextSegment : Sendable, Identifiable, Equatable {
@@ -302,7 +302,7 @@ extension OMP {
     }
     
     /// A segment containing structured content.
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public struct StructuredSegment: Sendable, Identifiable, Equatable {
@@ -327,7 +327,7 @@ extension OMP {
     /// Use this type to include images alongside text and structured content when
     /// constructing `Transcript` entries. Images can be provided as raw data with a
     /// MIME type or by URL.
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public struct ImageSegment: Sendable, Identifiable, Equatable {
@@ -347,7 +347,7 @@ extension OMP {
     }
     
     /// A definition of a tool.
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public struct ToolDefinition: Sendable, Equatable {
@@ -383,7 +383,7 @@ extension OMP {
       }
     }
     
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public struct Response : Sendable, Identifiable, Equatable {

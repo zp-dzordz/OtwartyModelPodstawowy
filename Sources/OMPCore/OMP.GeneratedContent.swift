@@ -4,7 +4,7 @@ extension OMP {
   /// A type that represents structured, generated content.
   ///
   /// Generated content may contain a single value, an array, or key-value pairs with unique keys.
-  @available(iOS 13.0, macOS 15.0, *)
+  @available(iOS 13.0, macOS 14.0, *)
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
   public struct GeneratedContent: Sendable, Equatable, Generable, CustomDebugStringConvertible {
@@ -238,7 +238,7 @@ public enum GeneratedContentError: Error {
   case neverCannotBeInstantiated
 }
 
-@available(iOS 13.0, macOS 15.0, *)
+@available(iOS 13.0, macOS 14.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension OMP.GeneratedContent {

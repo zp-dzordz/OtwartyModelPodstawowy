@@ -139,13 +139,13 @@ extension OMP {
     }
     
     /// A error that occurs when there is a problem creating a generation schema.
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public enum SchemaError : Error, LocalizedError {
       
       /// The context in which the error occurred.
-      @available(iOS 13.0, macOS 15.0, *)
+      @available(iOS 13.0, macOS 14.0, *)
       @available(tvOS, unavailable)
       @available(watchOS, unavailable)
       public struct Context : Sendable {

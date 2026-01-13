@@ -1,0 +1,3 @@
+[submodule "Sources/CXGrammarBindings/xgrammar"]
+	path = Sources/CXGrammarBindings/xgrammar
+	url = https://github.com/mlc-ai/xgrammar.git

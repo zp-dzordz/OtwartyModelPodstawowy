@@ -5,7 +5,8 @@ The goal is to enable:
 
 - Users with older iOS and macOS devices.  
 - Users working with unsupported languages (such as Polish).  
-- Developers who want to learn syntax and experiment with the framework’s concepts.  
+- Developers who want to learn syntax and experiment with the framework’s concepts.
+- Work mainly focused on polish language, to figure out how localization affects model precision/performance
 
 This project is also a personal learning exercise for me — I want to understand LLMs better while building something practical.  
 

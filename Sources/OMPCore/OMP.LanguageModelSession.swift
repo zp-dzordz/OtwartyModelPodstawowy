@@ -2,7 +2,7 @@ import Foundation
 import Schema
 
 extension OMP {
-  @available(iOS 13.0, macOS 15.0, *)
+  @available(iOS 13.0, macOS 14.0, *)
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
   final public class LanguageModelSession {
@@ -148,7 +148,7 @@ extension OMP {
     }
     
     
-    @available(iOS 13.0, macOS 15.0, *)
+    @available(iOS 13.0, macOS 14.0, *)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public struct Response<Content> where Content: Generable {
@@ -236,12 +236,12 @@ extension OMP.LanguageModelSession {
   }
 }
 
-@available(iOS 13.0, macOS 15.0, *)
+@available(iOS 13.0, macOS 14.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension OMP.LanguageModelSession: @unchecked Sendable {}
 
-@available(iOS 17.0, macOS 15.0, *)
+@available(iOS 17.0, macOS 14.0, *)
 @available(tvOS, unavailable)
 @available(watchOS, unavailable)
 extension OMP.LanguageModelSession: nonisolated Observable {}

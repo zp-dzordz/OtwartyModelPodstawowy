@@ -2,7 +2,7 @@ import Foundation
 
 extension OMP {
   /// A unique identifier that is stable for the duration of a response, but not across responses.
-  @available(iOS 13.0, macOS 15.0, *)
+  @available(iOS 13.0, macOS 14.0, *)
   @available(tvOS, unavailable)
   @available(watchOS, unavailable)
   public struct GenerationID : Sendable, Hashable {
